@@ -474,6 +474,7 @@ void drawobject(VAO* obj,glm::vec3 trans,float angle,glm::vec3 rotat)
 }
 
 int blocks=10;
+int objcount=0;
 float camera_rotation_angle = 90;
 float rectangle_rotation = 0;
 float triangle_rotation = 0;
@@ -514,7 +515,7 @@ void draw ()
     Matrices.model = glm::mat4(1.0f);
 
     /* Render your scene */
-    for(int i=0;i<100;i++)
+    for(int i=0;i<objcount;i++)
     {
         drawobject(objects[i],trans[i],0.0f,glm::vec3(0,1,0));
     }
@@ -582,22 +583,26 @@ void initGL (GLFWwindow* window, int width, int height)
     // Create the models
     //createTriangle (); // Generate the VAO, VBOs, vertices data & copy into the array buffer
     //send half length of side
-    float numZ=-200.0f;
-    int objcount=0;
-    for(int i=0;i<blocks;i++)
+    float numY=-100.0f;
+    for(int k=0;k<2;k++)
     {
-        float numX=-200.0f;
-        for(int j=0;j<10;j++)
+        float numZ=-200.0f;
+        for(int i=0;i<blocks;i++)
         {
-            if(platform[i][j]==1)
+            float numX=-200.0f;
+            for(int j=0;j<10;j++)
             {
-                objects[objcount]=createCube(20.0f);
-                trans[objcount]=glm::vec3(numX,-100.0f,numZ);
-                objcount+=1;
+                if(platform[i][j]==1)
+                {
+                    objects[objcount]=createCube(20.0f);
+                    trans[objcount]=glm::vec3(numX,numY,numZ);
+                    objcount+=1;
+                }
+                numX+=40.0f;
             }
-            numX+=40.0f;
+            numZ+=40.0f;
         }
-        numZ+=40.0f;
+        numY+=40.0f;
     }
     // Create and compile our GLSL program from the shaders
     programID = LoadShaders( "Sample_GL.vert", "Sample_GL.frag" );
@@ -633,7 +638,9 @@ int main (int argc, char** argv)
             platform[i][j]=1;
         }
     }
-
+    platform[8][5]=0;
+    platform[7][2]=0;
+    platform[5][8]=0;
     initGL (window, width, height);
 
     double last_update_time = glfwGetTime(), current_time;
