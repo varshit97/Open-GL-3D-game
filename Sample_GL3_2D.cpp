@@ -411,48 +411,48 @@ VAO* createCube(float side)
     };
 
     GLfloat color_buffer_data [] = {
-        0,0,1, // color 1
-        0,0,1, // color 2
-        0,0,1, // color 3
-        0,0,1, // color 3
-        0,0,1, // color 4
-        0,0,1,  // color 1
+        1,0,0, // color 1
+        1,1,0, // color 2
+        1,0,0, // color 3
+        1,0,0, // color 3
+        1,1,0, // color 4
+        1,0,0,  // color 1
 
-        0,0,1, // color1
-        0,0,1, // color 2
-        0,0,1, // color 3
-        0,0,1, // color 3
-        0,0,1, // color 4
-        0,0,1,  // color 1
+        1,0,0, // color 1
+        1,1,0, // color 2
+        1,0,0, // color 3
+        1,0,0, // color 3
+        1,1,0, // color 4
+        1,0,0,  // color 1
 
-        0,0,1, // color 1
-        0,0,1, // color 2
-        0,0,1, // color 3
-        0,0,1, // color 3
-        0,0,1, // color 4
-        0,0,1,  // color 1
+        1,0,0, // color 1
+        1,1,0, // color 2
+        1,0,0, // color 3
+        1,0,0, // color 3
+        1,1,0, // color 4
+        1,0,0,  // color 1
 
-        0,0,1, // color 1
-        0,0,1, // color 2
-        0,1,1, // color 3
-        0,0,1, // color 3
-        0,0,1, // color 4
-        0,0,1,  // color 1
+        1,0,0, // color 1
+        1,1,0, // color 2
+        1,0,0, // color 3
+        1,0,0, // color 3
+        1,1,0, // color 4
+        1,0,0,  // color 1
 
+        1,0,0, // color 1
+        1,1,0, // color 2
+        1,0,0, // color 3
+        1,0,0, // color 3
+        1,1,0, // color 4
+        1,0,0,  // color 1
 
-        0,0,1, // color 1
-        0,0,1, // color 2
-        0,1,1, // color 3
-        0,0,1, // color 3
-        0,0,1, // color 4
-        0,0,1,  // color 1
+        1,0,0, // color 1
+        1,1,0, // color 2
+        1,0,0, // color 3
+        1,0,0, // color 3
+        1,1,0, // color 4
+        1,0,0,  // color 1
 
-        0,0,1, // color 1
-        0,0,1, // color 2
-        0,1,1, // color 3
-        0,0,1, // color 3
-        0,0,1, // color 4
-        0,0,1,  // color 1
     };
 
     // create3DObject creates and returns a handle to a VAO that can be used later
