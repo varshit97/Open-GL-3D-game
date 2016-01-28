@@ -461,7 +461,7 @@ VAO* createCube(float side)
 
 void drawobject(VAO* obj,glm::vec3 trans,float angle,glm::vec3 rotat)
 {
-    Matrices.view = glm::lookAt(glm::vec3(0,150,200), glm::vec3(0,0,0), glm::vec3(0,1,0));
+    Matrices.view = glm::lookAt(glm::vec3(0,200,20), glm::vec3(0,0,0), glm::vec3(0,1,0));
     glm::mat4 VP = Matrices.projection * Matrices.view;
     glm::mat4 MVP;
     Matrices.model = glm::mat4(1.0f);
@@ -625,6 +625,8 @@ void initGL (GLFWwindow* window, int width, int height)
     cout << "GLSL: " << glGetString(GL_SHADING_LANGUAGE_VERSION) << endl;
 }
 
+int holes=10;
+
 int main (int argc, char** argv)
 {
     int width = 800;
@@ -638,9 +640,12 @@ int main (int argc, char** argv)
             platform[i][j]=1;
         }
     }
-    platform[8][5]=0;
-    platform[7][2]=0;
-    platform[5][8]=0;
+    for(int i=0;i<holes;i++)
+    {
+        int fall1=rand()%10;
+        int fall2=rand()%10;
+        platform[fall1][fall2]=0;
+    }
     initGL (window, width, height);
 
     double last_update_time = glfwGetTime(), current_time;
