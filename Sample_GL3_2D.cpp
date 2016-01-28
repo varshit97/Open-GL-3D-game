@@ -211,6 +211,7 @@ bool triangle_rot_status = true;
 bool rectangle_rot_status = true;
 float movePlayerLeft=0.0f,movePlayerRight=0.0f;
 bool leftFlag=false,rightFlag=false;
+bool upFlag=false,downFlag=false;
 
 /* Executed when a regular key is pressed/released/held-down */
 /* Prefered for Keyboard events */
@@ -235,6 +236,12 @@ void keyboard (GLFWwindow* window, int key, int scancode, int action, int mods)
             case GLFW_KEY_RIGHT:
                 rightFlag=false;
                 break;
+            case GLFW_KEY_UP:
+                upFlag=false;
+                break;
+            case GLFW_KEY_DOWN:
+                downFlag=false;;
+                break;
             default:
                 break;
         }
@@ -249,6 +256,12 @@ void keyboard (GLFWwindow* window, int key, int scancode, int action, int mods)
                 break;
             case GLFW_KEY_RIGHT:
                 rightFlag=true;
+                break;
+            case GLFW_KEY_UP:
+                upFlag=true;
+                break;
+            case GLFW_KEY_DOWN:
+                downFlag=true;
                 break;
             default:
                 break;
@@ -329,6 +342,7 @@ float D2R(float A)
 }
 
 glm::vec3 trans[1000];
+float rotat[1000];
 VAO* objects[1000];
 VAO *triangle, *rectangle,*cube;
 int platform[10][10];
@@ -474,9 +488,101 @@ VAO* createCube(float side)
     return create3DObject(GL_TRIANGLES, 36, vertex_buffer_data, color_buffer_data, GL_FILL);
 }
 
+
+VAO* createCuboid(float side1,float side2,float side3)
+{
+    // GL3 accepts only Triangles. Quads are not supported
+GLfloat vertex_buffer_data [] = {
+        -side1,-side2,-side3, // triangle 1 : begin
+        -side1,-side2, side3,
+        -side1, side2, side3, // triangle 1 : end
+        side1, side2,-side3, // triangle 2 : begin
+        -side1,-side2,-side3,
+        -side1, side2,-side3,//triangle 2 end
+        side1,-side2, side3,
+        -side1,-side2,-side3,
+        side1,-side2,-side3,
+        side1, side2,-side3,
+        side1,-side2,-side3,
+        -side1,-side2,-side3,
+        -side1,-side2,-side3,
+        -side1, side2, side3,
+        -side1, side2,-side3,
+        side1,-side2, side3,
+        -side1,-side2, side3,
+        -side1,-side2,-side3,
+        -side1, side2, side3,
+        -side1,-side2, side3,
+        side1,-side2, side3,
+        side1, side2, side3,
+        side1,-side2,-side3,
+        side1, side2,-side3,
+        side1,-side2,-side3,
+        side1, side2, side3,
+        side1,-side2, side3,
+        side1, side2, side3,
+        side1, side2,-side3,
+        -side1, side2,-side3,
+        side1, side2, side3,
+        -side1, side2,-side3,
+        -side1, side2, side3,
+        side1, side2, side3,
+        -side1, side2, side3,
+        side1,-side2, side3
+    };
+
+    GLfloat color_buffer_data [] = {
+     0.583f,  0.771f,  0.014f,
+     0.609f,  0.115f,  0.436f,
+     0.327f,  0.483f,  0.844f,
+     0.822f,  0.569f,  0.201f,
+     0.435f,  0.602f,  0.223f,
+     0.310f,  0.747f,  0.185f,
+
+     0.597f,  0.770f,  0.761f,
+     0.559f,  0.436f,  0.730f,
+     0.359f,  0.583f,  0.152f,
+     0.483f,  0.596f,  0.789f,
+     0.559f,  0.861f,  0.639f,
+     0.195f,  0.548f,  0.859f,
+
+     0.014f,  0.184f,  0.576f,
+     0.771f,  0.328f,  0.970f,
+     0.406f,  0.615f,  0.116f,
+     0.676f,  0.977f,  0.133f,
+     0.971f,  0.572f,  0.833f,
+     0.140f,  0.616f,  0.489f,
+
+     0.997f,  0.513f,  0.064f,
+     0.945f,  0.719f,  0.592f,
+     0.543f,  0.021f,  0.978f,
+     0.279f,  0.317f,  0.505f,
+     0.167f,  0.620f,  0.077f,
+     0.347f,  0.857f,  0.137f,
+
+     0.055f,  0.953f,  0.042f,
+     0.714f,  0.505f,  0.345f,
+     0.783f,  0.290f,  0.734f,
+     0.722f,  0.645f,  0.174f,
+     0.302f,  0.455f,  0.848f,
+     0.225f,  0.587f,  0.040f,
+
+     0.517f,  0.713f,  0.338f,
+     0.053f,  0.959f,  0.120f,
+     0.393f,  0.621f,  0.362f,
+     0.673f,  0.211f,  0.457f,
+     0.820f,  0.883f,  0.371f,
+     0.982f,  0.099f,  0.879f
+
+    };
+
+    // create3DObject creates and returns a handle to a VAO that can be used later
+    return create3DObject(GL_TRIANGLES, 36, vertex_buffer_data, color_buffer_data, GL_FILL);
+}
+
 void drawobject(VAO* obj,glm::vec3 trans,float angle,glm::vec3 rotat)
 {
-    Matrices.view = glm::lookAt(glm::vec3(0,180,200), glm::vec3(0,0,0), glm::vec3(0,1,0));
+    Matrices.view = glm::lookAt(glm::vec3(0,500,700), glm::vec3(0,0,0), glm::vec3(0,1,0));
     glm::mat4 VP = Matrices.projection * Matrices.view;
     glm::mat4 MVP;
     Matrices.model = glm::mat4(1.0f);
@@ -495,6 +601,10 @@ int objcount=0;
 float camera_rotation_angle = 90;
 float rectangle_rotation = 0;
 float triangle_rotation = 0;
+float rotate_angle=0,ang=0.0f;;
+glm::vec3 rot;
+int heroIndex,rightHandIndex,leftHandIndex;
+bool rotRight=false,rotLeft=false;
 
 /* Render the scene with openGL */
 /* Edit this function according to your assignment */
@@ -532,19 +642,92 @@ void draw ()
     Matrices.model = glm::mat4(1.0f);
 
     /* Render your scene */
-    for(int i=0;i<objcount;i++)
-    {
-        drawobject(objects[i],trans[i],0.0f,glm::vec3(0,1,0));
-    }
     if(leftFlag)
     {
-        trans[objcount-1][0]-=2;
+        trans[heroIndex][0]-=2;
+        trans[rightHandIndex][0]-=2;
+        trans[leftHandIndex][0]-=2;
     }
     if(rightFlag)
     {
-        trans[objcount-1][0]+=2;
+        trans[heroIndex][0]+=2;
+        trans[rightHandIndex][0]+=2;
+        trans[leftHandIndex][0]+=2;
     }
-    drawobject(objects[objcount-1],trans[objcount-1],0.0f,glm::vec3(0,1,0));
+    if(upFlag)
+    {
+        trans[heroIndex][2]-=2;
+        trans[rightHandIndex][2]-=2;
+        trans[leftHandIndex][2]-=2;
+        if(rotat[rightHandIndex]<30 && !rotRight)
+        {
+            rotat[rightHandIndex]+=2.0f;
+        }
+        if(rotat[rightHandIndex]>=30)
+        {
+            rotRight=true;
+        }
+        if(rotRight)
+        {
+            rotat[rightHandIndex]-=2.0f;
+        }
+        if(rotat[rightHandIndex]<=-30)
+        {
+            rotRight=false;
+        }
+        if(rotat[leftHandIndex]>=-30 && !rotLeft)
+        {
+            rotat[leftHandIndex]-=2.0f;
+        }
+        if(rotat[leftHandIndex]<=-30)
+        {
+            rotLeft=true;
+        }
+        if(rotLeft)
+        {
+            rotat[leftHandIndex]+=2.0f;
+        }
+        if(rotat[leftHandIndex]>=30)
+        {
+            rotLeft=false;
+        }
+    }
+    if(downFlag)
+    {
+        trans[heroIndex][2]+=2;
+        trans[rightHandIndex][2]+=2;
+        trans[leftHandIndex][2]+=2;
+        if(rotat[rightHandIndex]<=-30)
+        {
+            rotat[rightHandIndex]-=2.0f;
+        }
+        if(rotat[rightHandIndex]>=30)
+        {
+            rotat[rightHandIndex]+=2.0f;
+        }
+        if(rotat[leftHandIndex]>=30)
+        {
+            rotat[leftHandIndex]-=2.0f;
+        }
+        if(rotat[leftHandIndex]<=-30)
+        {
+            rotat[leftHandIndex]+=2.0f;
+        }
+    }
+    for(int i=0;i<objcount;i++)
+    {
+        if(i==leftHandIndex || i==rightHandIndex)
+        {
+            rot=glm::vec3(1,0,0);
+        }
+        else
+        {
+            rot=glm::vec3(0,1,0);
+        }
+        drawobject(objects[i],trans[i],rotat[i],rot);
+    }
+    //drawobject(objects[objcount-2],trans[objcount-2],0.0f,glm::vec3(0,1,0));
+    //drawobject(objects[objcount-1],trans[objcount-1],rotate_angle,glm::vec3(1,0,0));
     // Increment angles
     float increments = 1;
 
@@ -623,6 +806,7 @@ void initGL (GLFWwindow* window, int width, int height)
                 {
                     objects[objcount]=createCube(20.0f);
                     trans[objcount]=glm::vec3(numX,numY,numZ);
+                    rotat[objcount]=0.0f;
                     objcount+=1;
                 }
                 //pillars
@@ -633,6 +817,7 @@ void initGL (GLFWwindow* window, int width, int height)
                     {
                         objects[objcount]=createCube(20.0f);
                         trans[objcount]=glm::vec3(numX,pillarY,numZ);
+                        rotat[objcount]=0.0f;
                         objcount+=1;
                         pillarY+=40.0f;
                     }
@@ -646,6 +831,20 @@ void initGL (GLFWwindow* window, int width, int height)
     //Hero
     objects[objcount]=createCube(20.0f);
     trans[objcount]=glm::vec3(-300.0f,200.0f,150.0f);
+    heroIndex=objcount;
+    rotat[objcount]=0.0f;
+    objcount+=1;
+    //Hero righthand
+    objects[objcount]=createCuboid(20.0f,30.0f,20.0f);
+    trans[objcount]=glm::vec3(-260.0f,200.0f,150.0f);
+    rightHandIndex=objcount;
+    rotat[objcount]=0.0f;
+    objcount+=1;
+    //Hero left hand
+    objects[objcount]=createCuboid(20.0f,30.0f,20.0f);
+    trans[objcount]=glm::vec3(-340.0f,200.0f,150.0f);
+    leftHandIndex=objcount;
+    rotat[objcount]=0.0f;
     objcount+=1;
     // Create and compile our GLSL program from the shaders
     programID = LoadShaders( "Sample_GL.vert", "Sample_GL.frag" );
