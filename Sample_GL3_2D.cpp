@@ -835,13 +835,13 @@ void initGL (GLFWwindow* window, int width, int height)
     rotat[objcount]=0.0f;
     objcount+=1;
     //Hero righthand
-    objects[objcount]=createCuboid(20.0f,30.0f,20.0f);
+    objects[objcount]=createCuboid(20.0f,40.0f,20.0f);
     trans[objcount]=glm::vec3(-260.0f,200.0f,150.0f);
     rightHandIndex=objcount;
     rotat[objcount]=0.0f;
     objcount+=1;
     //Hero left hand
-    objects[objcount]=createCuboid(20.0f,30.0f,20.0f);
+    objects[objcount]=createCuboid(20.0f,40.0f,20.0f);
     trans[objcount]=glm::vec3(-340.0f,200.0f,150.0f);
     leftHandIndex=objcount;
     rotat[objcount]=0.0f;
