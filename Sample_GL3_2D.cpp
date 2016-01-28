@@ -1,3 +1,4 @@
+
 #include <iostream>
 #include <cmath>
 #include <fstream>
@@ -208,6 +209,8 @@ float triangle_rot_dir = 1;
 float rectangle_rot_dir = 1;
 bool triangle_rot_status = true;
 bool rectangle_rot_status = true;
+float movePlayerLeft=0.0f,movePlayerRight=0.0f;
+bool leftFlag=false,rightFlag=false;
 
 /* Executed when a regular key is pressed/released/held-down */
 /* Prefered for Keyboard events */
@@ -226,6 +229,12 @@ void keyboard (GLFWwindow* window, int key, int scancode, int action, int mods)
             case GLFW_KEY_X:
                 // do something ..
                 break;
+            case GLFW_KEY_LEFT:
+                leftFlag=false;
+                break;
+            case GLFW_KEY_RIGHT:
+                rightFlag=false;
+                break;
             default:
                 break;
         }
@@ -234,6 +243,12 @@ void keyboard (GLFWwindow* window, int key, int scancode, int action, int mods)
         switch (key) {
             case GLFW_KEY_ESCAPE:
                 quit(window);
+                break;
+            case GLFW_KEY_LEFT:
+                leftFlag=true;
+                break;
+            case GLFW_KEY_RIGHT:
+                rightFlag=true;
                 break;
             default:
                 break;
@@ -461,7 +476,7 @@ VAO* createCube(float side)
 
 void drawobject(VAO* obj,glm::vec3 trans,float angle,glm::vec3 rotat)
 {
-    Matrices.view = glm::lookAt(glm::vec3(0,180,150), glm::vec3(0,0,0), glm::vec3(0,1,0));
+    Matrices.view = glm::lookAt(glm::vec3(0,180,200), glm::vec3(0,0,0), glm::vec3(0,1,0));
     glm::mat4 VP = Matrices.projection * Matrices.view;
     glm::mat4 MVP;
     Matrices.model = glm::mat4(1.0f);
@@ -521,6 +536,15 @@ void draw ()
     {
         drawobject(objects[i],trans[i],0.0f,glm::vec3(0,1,0));
     }
+    if(leftFlag)
+    {
+        trans[objcount-1][0]-=2;
+    }
+    if(rightFlag)
+    {
+        trans[objcount-1][0]+=2;
+    }
+    drawobject(objects[objcount-1],trans[objcount-1],0.0f,glm::vec3(0,1,0));
     // Increment angles
     float increments = 1;
 
@@ -586,7 +610,7 @@ void initGL (GLFWwindow* window, int width, int height)
     //createTriangle (); // Generate the VAO, VBOs, vertices data & copy into the array buffer
     //send half length of side
     float numY=-100.0f;
-    for(int k=0;k<2;k++)
+    for(int k=0;k<1;k++)
     {
         float numZ=-200.0f;
         for(int i=0;i<blocks;i++)
@@ -621,7 +645,7 @@ void initGL (GLFWwindow* window, int width, int height)
     }
     //Hero
     objects[objcount]=createCube(20.0f);
-    trans[objcount]=glm::vec3(-200.0f,20.0f,200.0f);
+    trans[objcount]=glm::vec3(-300.0f,200.0f,150.0f);
     objcount+=1;
     // Create and compile our GLSL program from the shaders
     programID = LoadShaders( "Sample_GL.vert", "Sample_GL.frag" );
@@ -667,6 +691,7 @@ int main (int argc, char** argv)
         platform[2][3]=0;
         platform[3][4]=0;
         platform[6][2]=0;
+        platform[9][2]=0;
    // }
     platform[1][5]=2;
     platform[2][8]=2;
