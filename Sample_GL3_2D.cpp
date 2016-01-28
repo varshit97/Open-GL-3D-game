@@ -411,47 +411,47 @@ VAO* createCube(float side)
     };
 
     GLfloat color_buffer_data [] = {
-        1,0,0, // color 1
-        1,1,0, // color 2
-        1,0,0, // color 3
-        1,0,0, // color 3
-        1,1,0, // color 4
-        1,0,0,  // color 1
+     0.583f,  0.771f,  0.014f,
+     0.609f,  0.115f,  0.436f,
+     0.327f,  0.483f,  0.844f,
+     0.822f,  0.569f,  0.201f,
+     0.435f,  0.602f,  0.223f,
+     0.310f,  0.747f,  0.185f,
 
-        1,0,0, // color 1
-        1,1,0, // color 2
-        1,0,0, // color 3
-        1,0,0, // color 3
-        1,1,0, // color 4
-        1,0,0,  // color 1
+     0.597f,  0.770f,  0.761f,
+     0.559f,  0.436f,  0.730f,
+     0.359f,  0.583f,  0.152f,
+     0.483f,  0.596f,  0.789f,
+     0.559f,  0.861f,  0.639f,
+     0.195f,  0.548f,  0.859f,
 
-        1,0,0, // color 1
-        1,1,0, // color 2
-        1,0,0, // color 3
-        1,0,0, // color 3
-        1,1,0, // color 4
-        1,0,0,  // color 1
+     0.014f,  0.184f,  0.576f,
+     0.771f,  0.328f,  0.970f,
+     0.406f,  0.615f,  0.116f,
+     0.676f,  0.977f,  0.133f,
+     0.971f,  0.572f,  0.833f,
+     0.140f,  0.616f,  0.489f,
 
-        1,0,0, // color 1
-        1,1,0, // color 2
-        1,0,0, // color 3
-        1,0,0, // color 3
-        1,1,0, // color 4
-        1,0,0,  // color 1
+     0.997f,  0.513f,  0.064f,
+     0.945f,  0.719f,  0.592f,
+     0.543f,  0.021f,  0.978f,
+     0.279f,  0.317f,  0.505f,
+     0.167f,  0.620f,  0.077f,
+     0.347f,  0.857f,  0.137f,
 
-        1,0,0, // color 1
-        1,1,0, // color 2
-        1,0,0, // color 3
-        1,0,0, // color 3
-        1,1,0, // color 4
-        1,0,0,  // color 1
+     0.055f,  0.953f,  0.042f,
+     0.714f,  0.505f,  0.345f,
+     0.783f,  0.290f,  0.734f,
+     0.722f,  0.645f,  0.174f,
+     0.302f,  0.455f,  0.848f,
+     0.225f,  0.587f,  0.040f,
 
-        1,0,0, // color 1
-        1,1,0, // color 2
-        1,0,0, // color 3
-        1,0,0, // color 3
-        1,1,0, // color 4
-        1,0,0,  // color 1
+     0.517f,  0.713f,  0.338f,
+     0.053f,  0.959f,  0.120f,
+     0.393f,  0.621f,  0.362f,
+     0.673f,  0.211f,  0.457f,
+     0.820f,  0.883f,  0.371f,
+     0.982f,  0.099f,  0.879f
 
     };
 
@@ -461,7 +461,7 @@ VAO* createCube(float side)
 
 void drawobject(VAO* obj,glm::vec3 trans,float angle,glm::vec3 rotat)
 {
-    Matrices.view = glm::lookAt(glm::vec3(0,200,20), glm::vec3(0,0,0), glm::vec3(0,1,0));
+    Matrices.view = glm::lookAt(glm::vec3(0,180,150), glm::vec3(0,0,0), glm::vec3(0,1,0));
     glm::mat4 VP = Matrices.projection * Matrices.view;
     glm::mat4 MVP;
     Matrices.model = glm::mat4(1.0f);
@@ -474,6 +474,8 @@ void drawobject(VAO* obj,glm::vec3 trans,float angle,glm::vec3 rotat)
 }
 
 int blocks=10;
+int holes=10;
+int pillarHeight=3;
 int objcount=0;
 float camera_rotation_angle = 90;
 float rectangle_rotation = 0;
@@ -592,11 +594,24 @@ void initGL (GLFWwindow* window, int width, int height)
             float numX=-200.0f;
             for(int j=0;j<10;j++)
             {
+                //floor
                 if(platform[i][j]==1)
                 {
                     objects[objcount]=createCube(20.0f);
                     trans[objcount]=glm::vec3(numX,numY,numZ);
                     objcount+=1;
+                }
+                //pillars
+                if(platform[i][j]==2)
+                {
+                    float pillarY=numY+40.0f;
+                    for(int l=0;l<pillarHeight;l++)
+                    {
+                        objects[objcount]=createCube(20.0f);
+                        trans[objcount]=glm::vec3(numX,pillarY,numZ);
+                        objcount+=1;
+                        pillarY+=40.0f;
+                    }
                 }
                 numX+=40.0f;
             }
@@ -604,6 +619,10 @@ void initGL (GLFWwindow* window, int width, int height)
         }
         numY+=40.0f;
     }
+    //Hero
+    objects[objcount]=createCube(20.0f);
+    trans[objcount]=glm::vec3(-200.0f,20.0f,200.0f);
+    objcount+=1;
     // Create and compile our GLSL program from the shaders
     programID = LoadShaders( "Sample_GL.vert", "Sample_GL.frag" );
     // Get a handle for our "MVP" uniform
@@ -625,14 +644,13 @@ void initGL (GLFWwindow* window, int width, int height)
     cout << "GLSL: " << glGetString(GL_SHADING_LANGUAGE_VERSION) << endl;
 }
 
-int holes=10;
-
 int main (int argc, char** argv)
 {
     int width = 800;
     int height = 600;
 
     GLFWwindow* window = initGLFW(width, height);
+    //Map
     for(int i=0;i<10;i++)
     {
         for(int j=0;j<10;j++)
@@ -640,12 +658,20 @@ int main (int argc, char** argv)
             platform[i][j]=1;
         }
     }
-    for(int i=0;i<holes;i++)
-    {
-        int fall1=rand()%10;
-        int fall2=rand()%10;
-        platform[fall1][fall2]=0;
-    }
+    //Pits
+    //for(int i=0;i<holes;i++)
+   // {
+   //     int fall1=rand()%10;
+   //     int fall2=rand()%10;
+        platform[1][2]=0;
+        platform[2][3]=0;
+        platform[3][4]=0;
+        platform[6][2]=0;
+   // }
+    platform[1][5]=2;
+    platform[2][8]=2;
+    platform[3][7]=2;
+    platform[6][6]=2;
     initGL (window, width, height);
 
     double last_update_time = glfwGetTime(), current_time;
