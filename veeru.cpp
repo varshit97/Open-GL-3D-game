@@ -329,7 +329,11 @@ GLuint createTexture (const char* filename)
  * Customizable functions *
  **************************/
 
- VAO *cube;
+VAO *cube;
+double length_of_base=20;
+int width = 1000;
+int height = 700;
+
 
 float formatAngle(float A)
 {
@@ -421,7 +425,7 @@ void reshapeWindow (GLFWwindow* window, int width, int height)
 	// Matrices.projection = glm::perspective (fov, (GLfloat) fbwidth / (GLfloat) fbheight, 0.1f, 500.0f);
 
 	// Ortho projection for 2D views
-	Matrices.projection = glm::ortho(0.0f, 400.0f,0.0f, 400.0f, 0.1f, 500.0f);
+	Matrices.projection = glm::ortho(0.0f, width*1.0f,0.0f, height*1.0f, 0.1f, 500.0f);
 }
 VAO* createSector(float R,int parts,double clr[6][3])
 {
@@ -457,48 +461,59 @@ VAO* createRectangle1(double length, double breadth, double clr[6][3])
   return create3DObject(GL_TRIANGLES, 6, vertex_buffer_data, color_buffer_data, GL_FILL);
 }
 
-VAO* createCube(double clr[36][3])
+VAO* createCube(GLfloat clr[108],double length)
 {
-	static const GLfloat vertex_buffer_data[] = 
+	GLfloat vertex_buffer_data[] = 
 	{
-	    -10.0f,-10.0f,-10.0f, // triangle 1 : begin
-	    -10.0f,-10.0f, 10.0f,
-	    -10.0f, 10.0f, 10.0f, // triangle 1 : end
-	    10.0f, 10.0f,-10.0f, // triangle 2 : begin
-	    -10.0f,-10.0f,-10.0f,
-	    -10.0f, 10.0f,-10.0f, // triangle 2 : end
-	    10.0f,-10.0f, 10.0f,
-	    -10.0f,-10.0f,-10.0f,
-	    10.0f,-10.0f,-10.0f,
-	    10.0f, 10.0f,-10.0f,
-	    10.0f,-10.0f,-10.0f,
-	    -10.0f,-10.0f,-10.0f,
-	    -10.0f,-10.0f,-10.0f,
-	    -10.0f, 10.0f, 10.0f,
-	    -10.0f, 10.0f,-10.0f,
-	    10.0f,-10.0f, 10.0f,
-	    -10.0f,-10.0f, 10.0f,
-	    -10.0f,-10.0f,-10.0f,
-	    -10.0f, 10.0f, 10.0f,
-	    -10.0f,-10.0f, 10.0f,
-	    10.0f,-10.0f, 10.0f,
-	    10.0f, 10.0f, 10.0f,
-	    10.0f,-10.0f,-10.0f,
-	    10.0f, 10.0f,-10.0f,
-	    10.0f,-10.0f,-10.0f,
-	    10.0f, 10.0f, 10.0f,
-	    10.0f,-10.0f, 10.0f,
-	    10.0f, 10.0f, 10.0f,
-	    10.0f, 10.0f,-10.0f,
-	    -10.0f, 10.0f,-10.0f,
-	    10.0f, 10.0f, 10.0f,
-	    -10.0f, 10.0f,-10.0f,
-	    -10.0f, 10.0f, 10.0f,
-	    10.0f, 10.0f, 10.0f,
-	    -10.0f, 10.0f, 10.0f,
-	    10.0f,-10.0f, 10.0f
+	    0.0f,0.0f,0.0f,
+	    length*1.0f,0.0f,0.0f,
+	    0.0f,length*1.0f,0.0f,
+
+		length*1.0f,0.0f,0.0f,
+	    0.0f,length*1.0f,0.0f,
+	    length*1.0f,length*1.0f,0,
+
+	    length*1.0f,0.0f,0.0f,
+	    length*1.0f,length*1.0f,0.0f,
+	    length*1.0f,length*1.0f,-1*length*1.0f,
+
+		length*1.0f,0.0f,0.0f,
+	    length*1.0f,length*1.0f,0.0f,
+	    length*1.0f,length*1.0f,-1*length*1.0f,
+
+   	    length*1.0f,length*1.0f,-1*length*1.0f,
+   	    0.0f,0.0f,-1*length*1.0f,
+   	    length*1.0f,0,-1*length*1.0f,
+
+		length*1.0f,length*1.0f,-1*length*1.0f,
+   	    0.0f,0.0f,-1*length*1.0f,
+   	    0.0f,length*1.0f,-1*length*1.0f,
+
+   	    0.0f,0.0f,-1*length*1.0f,
+   	    0.0f,length*1.0f,-1*length*1.0f,
+   	    0.0f,0.0f,0.0f,
+
+   	    0.0f,length*1.0f,-1*length*1.0f,
+   	    0.0f,0.0f,0.0f,
+   	    0.0f,length*1.0f,0.0f,
+
+		0.0f,length*1.0f,0.0f,
+		length*1.0f,0.0f,0.0f,
+		length*1.0f,length*1.0f,-1*length*1.0f,
+
+		length*1.0f,length*1.0f,-1*length*1.0f,
+		0.0f,length*1.0f,0.0f,
+		0.0f,length*1.0f,-1*length*1.0f,
+
+		0.0f,0.0f,0.0f,
+		length*1.0f,0.0f,-1*length*1.0f,
+		length*1.0f,0.0f,0.0f,
+
+		0.0f,0.0f,0.0f,
+		length*1.0f,0.0f,-1*length*1.0f,  	    
+		0.0f,0.0f,-1*length*1.0f
 	};
-	const GLfloat color_buffer_data [] = 
+	/*const GLfloat color_buffer_data [] = 
 	{
 	    clr[0][0],clr[0][1],clr[0][2], // color 1
 	    clr[1][0],clr[1][1],clr[1][2], // color 2
@@ -595,37 +610,13 @@ VAO* createCube(double clr[36][3])
 	    clr[3][0],clr[3][1],clr[3][2], // color 3
 	    clr[4][0],clr[4][1],clr[4][2], // color 4
 	    clr[5][0],clr[5][1],clr[5][2]  // color 1
-  	};
-  	return create3DObject(GL_TRIANGLES, 36, vertex_buffer_data, color_buffer_data, GL_FILL);
+  	};*/
+  	return create3DObject(GL_TRIANGLES, 36, vertex_buffer_data, clr, GL_FILL);
 }
-
-// Creates the triangle object used in this sample code
-// void createTriangle ()
-// {
-// 	/* ONLY vertices between the bounds specified in glm::ortho will be visible on screen */
-
-// 	/* Define vertex array as used in glBegin (GL_TRIANGLES) */
-// 	static const GLfloat vertex_buffer_data [] = {
-// 		0, 1,0, // vertex 0
-// 		-1,-1,0, // vertex 1
-// 		1,-1,0, // vertex 2
-// 	};
-
-// 	static const GLfloat color_buffer_data [] = {
-// 		1,0,0, // color 0
-// 		0,1,0, // color 1
-// 		0,0,1, // color 2
-// 	};
-
-// 	// create3DObject creates and returns a handle to a VAO that can be used later
-// 	return create3DObject(GL_TRIANGLES, 3, vertex_buffer_data, color_buffer_data, GL_LINE);
-// }
-
-// Creates the rectangle object used in this sample code
 
 void drawobject(VAO* obj,glm::vec3 trans,float angle,glm::vec3 rotat)
 {
-    Matrices.view = glm::lookAt(glm::vec3(0,200,300), glm::vec3(0,0,0), glm::vec3(0,1,0));
+    Matrices.view = glm::lookAt(glm::vec3(100,100,200), glm::vec3(0,0,0), glm::vec3(0,1,0));
     glm::mat4 VP = Matrices.projection * Matrices.view;
     glm::mat4 MVP;  // MVP = Projection * View * Model
     Matrices.model = glm::mat4(1.0f);
@@ -639,7 +630,7 @@ void drawobject(VAO* obj,glm::vec3 trans,float angle,glm::vec3 rotat)
 
 void drawtext(char *s)
 {
-	static int fontScale = 0;
+	static int fontScale = 1;
 	float fontScaleValue = 0.75 + 0.25*sinf(fontScale*M_PI/180.0f);
 	fontScale = (fontScale + 1) % 360;
 	glm::vec3 fontColor = getRGBfromHue (fontScale);
@@ -661,9 +652,14 @@ void draw ()
 	glUseProgram (programID);
 	glUseProgram(textureProgramID);
 	glUseProgram(fontProgramID);
-	drawtext("hello");
+	//drawtext("hello");
 	//for (int i = 0; i < 10; ++i)
-		drawobject(cube,glm::vec3(100,100,100),0,glm::vec3(0,0,1));
+	glUseProgram (programID);
+	for (int i2 = 0; i2 <20;i2++)
+		for (int i1 = 0; i1 <2;i1++)
+			for (int i = 0; i <30;i++)
+				drawobject(cube,glm::vec3(50+i*length_of_base,140+i1*length_of_base,-200+(-1*i2*length_of_base)),0,glm::vec3(0,0,1));
+		//drawobject(cube,glm::vec3(150+2*length_of_base,440,0),0,glm::vec3(0,0,1));
 }
 GLFWwindow* initGLFW (int width, int height)
 {
@@ -733,14 +729,16 @@ void initGL (GLFWwindow* window, int width, int height)
 		glfwTerminate();
 		exit(EXIT_FAILURE);
 	}
-	double clr[36][3];
-	for (int i = 0; i < 36;i++)
+	GLfloat clr[108];
+	for (int i = 0; i < 108;i++)
 	{
-		clr[i][0]=1;
-		clr[i][1]=1;
-		clr[i][2]=1;
-	}
-	cube=createCube(clr);
+		clr[i]=0;
+		if (i<90&&i>=72)
+		{
+			clr[i]=1;
+		}
+	}	
+	cube=createCube(clr,length_of_base);
 	fontProgramID = LoadShaders( "fontrender.vert", "fontrender.frag" );
 	GLint fontVertexCoordAttrib, fontVertexNormalAttrib, fontVertexOffsetUniform;
 	fontVertexCoordAttrib = glGetAttribLocation(fontProgramID, "vertexPosition");
@@ -761,9 +759,6 @@ void initGL (GLFWwindow* window, int width, int height)
 
 int main (int argc, char** argv)
 {
-	int width = 600;
-	int height = 600;
-
 	GLFWwindow* window = initGLFW(width, height);
 
 	initGL (window, width, height);

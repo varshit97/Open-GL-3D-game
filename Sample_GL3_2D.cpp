@@ -604,7 +604,7 @@ float triangle_rotation = 0;
 float rotate_angle=0,ang=0.0f;;
 glm::vec3 rot;
 int heroIndex,rightHandIndex,leftHandIndex;
-bool rotRight=false,rotLeft=false;
+bool rotRight=false,rotLeft=false,rotR=false,rotL=false;
 
 /* Render the scene with openGL */
 /* Edit this function according to your assignment */
@@ -697,21 +697,37 @@ void draw ()
         trans[heroIndex][2]+=2;
         trans[rightHandIndex][2]+=2;
         trans[leftHandIndex][2]+=2;
-        if(rotat[rightHandIndex]<=-30)
+        if(rotat[rightHandIndex]>=-30 && !rotR)
         {
             rotat[rightHandIndex]-=2.0f;
         }
-        if(rotat[rightHandIndex]>=30)
+        if(rotat[rightHandIndex]<=-30)
+        {
+            rotR=true;
+        }
+        if(rotR)
         {
             rotat[rightHandIndex]+=2.0f;
         }
+        if(rotat[rightHandIndex]>=30)
+        {
+            rotR=false;
+        }
+        if(rotat[leftHandIndex]<=30 && !rotL)
+        {
+            rotat[leftHandIndex]+=2.0f;
+        }
         if(rotat[leftHandIndex]>=30)
+        {
+            rotL=true;
+        }
+        if(rotL)
         {
             rotat[leftHandIndex]-=2.0f;
         }
         if(rotat[leftHandIndex]<=-30)
         {
-            rotat[leftHandIndex]+=2.0f;
+            rotL=false;
         }
     }
     for(int i=0;i<objcount;i++)
