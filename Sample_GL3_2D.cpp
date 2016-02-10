@@ -212,9 +212,9 @@ bool rectangle_rot_status = true;
 float movePlayerLeft=0.0f,movePlayerRight=0.0f;
 bool leftFlag=false,rightFlag=false;
 bool upFlag=false,downFlag=false,zoomFlag=false;
-bool heroFlag=false;
+bool heroFlag=false,zoom1Flag=false;
 float camAngle=0;
-bool fall=false,topFlag=false,followFlag=false;
+bool fall=false,topFlag=false,followFlag=false,headCamFlag=false;
 
 /* Executed when a regular key is pressed/released/held-down */
 /* Prefered for Keyboard events */
@@ -229,9 +229,6 @@ void keyboard (GLFWwindow* window, int key, int scancode, int action, int mods)
                 break;
             case GLFW_KEY_P:
                 triangle_rot_status = !triangle_rot_status;
-                break;
-            case GLFW_KEY_X:
-                // do something ..
                 break;
             case GLFW_KEY_LEFT:
                 leftFlag=false;
@@ -255,6 +252,12 @@ void keyboard (GLFWwindow* window, int key, int scancode, int action, int mods)
                 break;
             case GLFW_KEY_F:
                 followFlag=false;
+                break;
+            case GLFW_KEY_H:
+                headCamFlag=false;
+                break;
+            case GLFW_KEY_X:
+                zoom1Flag=false;
                 break;
             default:
                 break;
@@ -288,6 +291,12 @@ void keyboard (GLFWwindow* window, int key, int scancode, int action, int mods)
                 break;
             case GLFW_KEY_F:
                 followFlag=true;
+                break;
+            case GLFW_KEY_H:
+                headCamFlag=true;
+                break;
+            case GLFW_KEY_X:
+                zoom1Flag=true;
                 break;
             default:
                 break;
@@ -610,6 +619,7 @@ int heroIndex,rightHandIndex,leftHandIndex;
 float x=trans[heroIndex][0];
 float y=trans[heroIndex][1];
 float z=trans[heroIndex][2];
+float varang=0;
 
 void drawobject(VAO* obj,glm::vec3 trans,float angle,glm::vec3 rotat)
 {
@@ -619,6 +629,15 @@ void drawobject(VAO* obj,glm::vec3 trans,float angle,glm::vec3 rotat)
         if(camAngle>=360)
         {
             camAngle=0;
+        }
+        Matrices.view = glm::lookAt(glm::vec3(700*cos(camAngle*(M_PI/180)),300,700*sin(camAngle*(M_PI/180))), glm::vec3(0,0,0), glm::vec3(0,1,0));
+    }
+    if(zoom1Flag)
+    {
+        camAngle-=0.01f;
+        if(camAngle<=0)
+        {
+            camAngle=360;
         }
         Matrices.view = glm::lookAt(glm::vec3(700*cos(camAngle*(M_PI/180)),300,700*sin(camAngle*(M_PI/180))), glm::vec3(0,0,0), glm::vec3(0,1,0));
     }
@@ -634,6 +653,10 @@ void drawobject(VAO* obj,glm::vec3 trans,float angle,glm::vec3 rotat)
     {
         Matrices.view = glm::lookAt(glm::vec3(x+50*cos(camAngle*(M_PI/180)),y+80,z+50*sin(camAngle*(M_PI/180))), glm::vec3(x,y,z), glm::vec3(0,1,0));
     }
+    if(headCamFlag)
+    {
+        Matrices.view = glm::lookAt(glm::vec3(x,y,z+20), glm::vec3(x,y,z+50), glm::vec3(0,1,0));
+    }
     glm::mat4 VP = Matrices.projection * Matrices.view;
     glm::mat4 MVP;
     Matrices.model = glm::mat4(1.0f);
@@ -645,7 +668,6 @@ void drawobject(VAO* obj,glm::vec3 trans,float angle,glm::vec3 rotat)
     draw3DObject(obj);
 }
 
-float varang=0;
 void drawHero(VAO* obj,glm::vec3 trans,float angle,glm::vec3 rotat,glm::vec3 hero)
 {
     glm::mat4 VP = Matrices.projection * Matrices.view;
