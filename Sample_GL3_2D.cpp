@@ -692,24 +692,6 @@ void draw ()
         {
         }
     }
-    /*if(leftFlag)
-    {
-        trans[heroIndex][0]-=0.3;
-        trans[rightHandIndex][0]-=0.3;
-        trans[leftHandIndex][0]-=0.3;
-        if(trans[rightHandIndex][0]<=-220)
-        {
-            trans[heroIndex][1]-=0.5;
-            trans[rightHandIndex][1]-=0.5;
-            trans[leftHandIndex][1]-=0.5;
-        }
-    }
-    if(rightFlag)
-    {
-        trans[heroIndex][0]+=0.3;
-        trans[rightHandIndex][0]+=0.3;
-        trans[leftHandIndex][0]+=0.3;
-    }*/
     if(upFlag)
     {
         trans[heroIndex][2]-=0.3*cos(varang*(M_PI/180));
