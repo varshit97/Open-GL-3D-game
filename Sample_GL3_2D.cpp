@@ -214,7 +214,7 @@ bool leftFlag=false,rightFlag=false;
 bool upFlag=false,downFlag=false,zoomFlag=false;
 bool heroFlag=false;
 float camAngle=0;
-bool fall=false,topFlag=false;
+bool fall=false,topFlag=false,followFlag=false;
 
 /* Executed when a regular key is pressed/released/held-down */
 /* Prefered for Keyboard events */
@@ -253,6 +253,9 @@ void keyboard (GLFWwindow* window, int key, int scancode, int action, int mods)
             case GLFW_KEY_T:
                 topFlag=false;
                 break;
+            case GLFW_KEY_F:
+                followFlag=false;
+                break;
             default:
                 break;
         }
@@ -282,6 +285,9 @@ void keyboard (GLFWwindow* window, int key, int scancode, int action, int mods)
                 break;
             case GLFW_KEY_T:
                 topFlag=true;
+                break;
+            case GLFW_KEY_F:
+                followFlag=true;
                 break;
             default:
                 break;
@@ -600,6 +606,11 @@ GLfloat vertex_buffer_data [] = {
     return create3DObject(GL_TRIANGLES, 36, vertex_buffer_data, color_buffer_data, GL_FILL);
 }
 
+int heroIndex,rightHandIndex,leftHandIndex;
+float x=trans[heroIndex][0];
+float y=trans[heroIndex][1];
+float z=trans[heroIndex][2];
+
 void drawobject(VAO* obj,glm::vec3 trans,float angle,glm::vec3 rotat)
 {
     if(zoomFlag)
@@ -619,6 +630,10 @@ void drawobject(VAO* obj,glm::vec3 trans,float angle,glm::vec3 rotat)
     { 
         Matrices.view = glm::lookAt(glm::vec3(0,500,30*sin(camAngle*(M_PI/180))), glm::vec3(0,0,0), glm::vec3(0,1,0));
     }
+    if(followFlag)
+    {
+        Matrices.view = glm::lookAt(glm::vec3(x+50*cos(camAngle*(M_PI/180)),y+80,z+50*sin(camAngle*(M_PI/180))), glm::vec3(x,y,z), glm::vec3(0,1,0));
+    }
     glm::mat4 VP = Matrices.projection * Matrices.view;
     glm::mat4 MVP;
     Matrices.model = glm::mat4(1.0f);
@@ -630,7 +645,6 @@ void drawobject(VAO* obj,glm::vec3 trans,float angle,glm::vec3 rotat)
     draw3DObject(obj);
 }
 
-int heroIndex,rightHandIndex,leftHandIndex;
 float varang=0;
 void drawHero(VAO* obj,glm::vec3 trans,float angle,glm::vec3 rotat,glm::vec3 hero)
 {
@@ -702,6 +716,9 @@ void draw ()
 
     // Load identity to model matrix
     Matrices.model = glm::mat4(1.0f);
+    x=trans[heroIndex][0];
+    y=trans[heroIndex][1];
+    z=trans[heroIndex][2];
     /* Render your scene */
     if(Oiterator==pitCount)
     {
