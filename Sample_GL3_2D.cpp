@@ -214,7 +214,7 @@ bool leftFlag=false,rightFlag=false;
 bool upFlag=false,downFlag=false,zoomFlag=false;
 bool heroFlag=false;
 float camAngle=0;
-bool fall=false;
+bool fall=false,topFlag=false;
 
 /* Executed when a regular key is pressed/released/held-down */
 /* Prefered for Keyboard events */
@@ -250,6 +250,9 @@ void keyboard (GLFWwindow* window, int key, int scancode, int action, int mods)
             case GLFW_KEY_Z:
                 zoomFlag=false;
                 break;
+            case GLFW_KEY_T:
+                topFlag=false;
+                break;
             default:
                 break;
         }
@@ -276,6 +279,9 @@ void keyboard (GLFWwindow* window, int key, int scancode, int action, int mods)
                 break;
             case GLFW_KEY_A:
                 fall=false;
+                break;
+            case GLFW_KEY_T:
+                topFlag=true;
                 break;
             default:
                 break;
@@ -609,6 +615,10 @@ void drawobject(VAO* obj,glm::vec3 trans,float angle,glm::vec3 rotat)
     {
         Matrices.view = glm::lookAt(glm::vec3(700*cos(camAngle*(M_PI/180)),300,700*sin(camAngle*(M_PI/180))), glm::vec3(0,0,0), glm::vec3(0,1,0));
     }
+    if(topFlag)
+    { 
+        Matrices.view = glm::lookAt(glm::vec3(0,500,30*sin(camAngle*(M_PI/180))), glm::vec3(0,0,0), glm::vec3(0,1,0));
+    }
     glm::mat4 VP = Matrices.projection * Matrices.view;
     glm::mat4 MVP;
     Matrices.model = glm::mat4(1.0f);
@@ -645,12 +655,12 @@ float dist(float x1,float y1,float z1,float x2,float y2,float z2)
 
 int countobj=0;
 glm::vec3 pits[1000];
-int pillars[1000];
+glm::vec3 pillars[1000];
 int blocks=10;
 int holes=10;
-int pitCount=0;
+int pitCount=0,pillCount=0;
 int pillarHeight=3;
-int objcount=0,Oiterator=0;
+int objcount=0,Oiterator=0,PillIterator=0;
 float camera_rotation_angle = 90;
 float rectangle_rotation = 0;
 float triangle_rotation = 0;
@@ -697,6 +707,10 @@ void draw ()
     {
         Oiterator=0;
     }
+    if(PillIterator==pillCount)
+    {
+        PillIterator=0;
+    }
     if(trans[heroIndex][0]<=pits[Oiterator][0]+20 && trans[heroIndex][0]>=pits[Oiterator][0]-20 && trans[heroIndex][2]<=pits[Oiterator][2]+20 && trans[heroIndex][2]>=pits[Oiterator][2]-20 && !fall)
     {
         fall=true;
@@ -713,7 +727,9 @@ void draw ()
         trans[leftHandIndex][1]-=0.5;   
         trans[rightHandIndex][1]-=0.5;   
     }
-    if(upFlag)
+    cout << "hero X " << trans[heroIndex][0]-pillars[PillIterator][0] << endl;
+    cout << "hero Z " << trans[heroIndex][2]-pillars[PillIterator][2] << endl;
+    if(upFlag && (trans[heroIndex][0]-pillars[PillIterator][0]>=25 || trans[heroIndex][0]-pillars[PillIterator][0]<=-25) && (trans[heroIndex][2]-pillars[PillIterator][2]>=25 || trans[heroIndex][2]-pillars[PillIterator][2]<=-25))
     {
         trans[heroIndex][2]-=0.3*cos(varang*(M_PI/180));
         trans[heroIndex][0]-=0.3*sin(varang*(M_PI/180));
@@ -754,7 +770,7 @@ void draw ()
             rotLeft=false;
         }
     }
-    if(downFlag)
+    if(downFlag && (trans[heroIndex][0]-pillars[PillIterator][0]>=25 || trans[heroIndex][0]-pillars[PillIterator][0]<=-25) && (trans[heroIndex][2]-pillars[PillIterator][2]>=25 || trans[heroIndex][2]-pillars[PillIterator][2]<=-25))
     {
         trans[heroIndex][2]+=0.3*cos(varang*(M_PI/180));
         trans[heroIndex][0]+=0.3*sin(varang*(M_PI/180));
@@ -828,6 +844,7 @@ void draw ()
         }   
     }
     Oiterator+=1;
+    PillIterator+=1;
     //drawobject(objects[objcount-2],trans[objcount-2],0.0f,glm::vec3(0,1,0));
     //drawobject(objects[objcount-1],trans[objcount-1],rotate_angle,glm::vec3(1,0,0));
     // Increment angles
@@ -920,11 +937,12 @@ void initGL (GLFWwindow* window, int width, int height)
                     {
                         objects[objcount]=createCube(20.0f);
                         trans[objcount]=glm::vec3(numX,pillarY,numZ);
-                        pillars[objcount]=1;
                         rotat[objcount]=0.0f;
                         objcount+=1;
                         pillarY+=40.0f;
                     }
+                    pillars[pillCount]=glm::vec3(numX,pillarY,numZ);
+                    pillCount+=1;
                 }
                 else if(platform[i][j]==0)
                 {
@@ -1006,7 +1024,10 @@ int main (int argc, char** argv)
     platform[3][7]=2;
     platform[6][6]=2;
     initGL (window, width, height);
-
+    for(int i=0;i<pillCount;i++)
+    {
+        cout << "Pillars " << pillars[i][0] << " " << pillars[i][2] << endl;
+    }
     double last_update_time = glfwGetTime(), current_time;
     /* Draw in loop */
     while (!glfwWindowShouldClose(window)) {
