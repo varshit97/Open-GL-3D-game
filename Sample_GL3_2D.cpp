@@ -612,16 +612,12 @@ void drawobject(VAO* obj,glm::vec3 trans,float angle,glm::vec3 rotat)
 
 int heroIndex,rightHandIndex,leftHandIndex;
 float varang=0;
-void drawHero(VAO* obj,glm::vec3 trans,float angle,glm::vec3 rotat,glm::vec3 hero,bool direction)
+void drawHero(VAO* obj,glm::vec3 trans,float angle,glm::vec3 rotat,glm::vec3 hero)
 {
     glm::mat4 VP = Matrices.projection * Matrices.view;
     glm::mat4 MVP;
     Matrices.model = glm::mat4(1.0f);
     glm::mat4 toorigin = glm::translate(trans-hero);
-    if(!direction)
-    {
-        varang=-varang;
-    }
     glm::mat4 rotateatorg = glm::rotate(D2R(formatAngle(varang)), glm::vec3(0,1,0));
     glm::mat4 translatemat = glm::translate(hero);
     glm::mat4 rotatemat = glm::rotate(D2R(formatAngle(angle)), rotat);
@@ -655,7 +651,6 @@ bool rotRight=false,rotLeft=false,rotR=false,rotL=false;
 /* Edit this function according to your assignment */
 void draw ()
 {
-    varang+=1;
     // clear the color and depth in the frame buffer
     glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -695,10 +690,9 @@ void draw ()
     {
         if(trans[heroIndex][0]<=-200+Oiterator*40)
         {
-            cout << "Fall" << endl;
         }
     }
-    if(leftFlag)
+    /*if(leftFlag)
     {
         trans[heroIndex][0]-=0.3;
         trans[rightHandIndex][0]-=0.3;
@@ -715,7 +709,7 @@ void draw ()
         trans[heroIndex][0]+=0.3;
         trans[rightHandIndex][0]+=0.3;
         trans[leftHandIndex][0]+=0.3;
-    }
+    }*/
     if(upFlag)
     {
         trans[heroIndex][2]-=0.3;
@@ -810,17 +804,17 @@ void draw ()
         {
             if(leftFlag)
             {
-                drawHero(objects[i],trans[i],rotat[i],rot,trans[heroIndex],true);
-                heroFlag=true;
+                drawHero(objects[i],trans[i],rotat[i],rot,trans[heroIndex]);
+                varang+=1;
             }
             if(rightFlag)
             {
-                drawHero(objects[i],trans[i],rotat[i],rot,trans[heroIndex],false);
-                heroFlag=true;
+                drawHero(objects[i],trans[i],rotat[i],rot,trans[heroIndex]);
+                varang-=1;
             }
-            if(!heroFlag)
+            if(!leftFlag || !rightFlag)
             {
-                drawobject(objects[i],trans[i],rotat[i],rot);
+                drawHero(objects[i],trans[i],rotat[i],rot,trans[heroIndex]);
             }
         }   
     }
