@@ -211,7 +211,8 @@ bool triangle_rot_status = true;
 bool rectangle_rot_status = true;
 float movePlayerLeft=0.0f,movePlayerRight=0.0f;
 bool leftFlag=false,rightFlag=false;
-bool upFlag=false,downFlag=false;
+bool upFlag=false,downFlag=false,zoomFlag=false;
+bool heroFlag=false;
 
 /* Executed when a regular key is pressed/released/held-down */
 /* Prefered for Keyboard events */
@@ -232,15 +233,20 @@ void keyboard (GLFWwindow* window, int key, int scancode, int action, int mods)
                 break;
             case GLFW_KEY_LEFT:
                 leftFlag=false;
+                heroFlag=false;
                 break;
             case GLFW_KEY_RIGHT:
                 rightFlag=false;
+                heroFlag=false;
                 break;
             case GLFW_KEY_UP:
                 upFlag=false;
                 break;
             case GLFW_KEY_DOWN:
                 downFlag=false;;
+                break;
+            case GLFW_KEY_Z:
+                zoomFlag=false;;
                 break;
             default:
                 break;
@@ -262,6 +268,9 @@ void keyboard (GLFWwindow* window, int key, int scancode, int action, int mods)
                 break;
             case GLFW_KEY_DOWN:
                 downFlag=true;
+                break;
+            case GLFW_KEY_Z:
+                zoomFlag=true;
                 break;
             default:
                 break;
@@ -310,7 +319,7 @@ void reshapeWindow (GLFWwindow* window, int width, int height)
        is different from WindowSize */
     glfwGetFramebufferSize(window, &fbwidth, &fbheight);
 
-    GLfloat fov = 90.0f;
+    GLfloat fov = 0.7f;
 
     // sets the viewport of openGL renderer
     glViewport (0, 0, (GLsizei) fbwidth, (GLsizei) fbheight);
@@ -321,10 +330,10 @@ void reshapeWindow (GLFWwindow* window, int width, int height)
        gluPerspective (fov, (GLfloat) fbwidth / (GLfloat) fbheight, 0.1, 500.0); */
     // Store the projection matrix in a variable for future use
     // Perspective projection for 3D views
-    // Matrices.projection = glm::perspective (fov, (GLfloat) fbwidth / (GLfloat) fbheight, 0.1f, 500.0f);
+     Matrices.projection = glm::perspective (fov, (GLfloat) fbwidth / (GLfloat) fbheight, 0.1f, 1200.0f);
 
     // Ortho projection for 2D views
-    Matrices.projection = glm::ortho(-400.0f, 400.0f, -300.0f, 300.0f, 0.1f, 1200.0f);
+    //Matrices.projection = glm::ortho(-400.0f, 400.0f, -300.0f, 300.0f, 0.1f, 1200.0f);
 }
 
 float formatAngle(float A)
@@ -582,7 +591,14 @@ GLfloat vertex_buffer_data [] = {
 
 void drawobject(VAO* obj,glm::vec3 trans,float angle,glm::vec3 rotat)
 {
-    Matrices.view = glm::lookAt(glm::vec3(0,500,700), glm::vec3(0,0,0), glm::vec3(0,1,0));
+    if(zoomFlag)
+    {
+        Matrices.view = glm::lookAt(glm::vec3(0,300,40), glm::vec3(0,0,0), glm::vec3(0,1,0));
+    }
+    else
+    {
+        Matrices.view = glm::lookAt(glm::vec3(300,400,600), glm::vec3(0,0,0), glm::vec3(0,1,0));
+    }
     glm::mat4 VP = Matrices.projection * Matrices.view;
     glm::mat4 MVP;
     Matrices.model = glm::mat4(1.0f);
@@ -594,22 +610,52 @@ void drawobject(VAO* obj,glm::vec3 trans,float angle,glm::vec3 rotat)
     draw3DObject(obj);
 }
 
+int heroIndex,rightHandIndex,leftHandIndex;
+float varang=0;
+void drawHero(VAO* obj,glm::vec3 trans,float angle,glm::vec3 rotat,glm::vec3 hero,bool direction)
+{
+    glm::mat4 VP = Matrices.projection * Matrices.view;
+    glm::mat4 MVP;
+    Matrices.model = glm::mat4(1.0f);
+    glm::mat4 toorigin = glm::translate(trans-hero);
+    if(!direction)
+    {
+        varang=-varang;
+    }
+    glm::mat4 rotateatorg = glm::rotate(D2R(formatAngle(varang)), glm::vec3(0,1,0));
+    glm::mat4 translatemat = glm::translate(hero);
+    glm::mat4 rotatemat = glm::rotate(D2R(formatAngle(angle)), rotat);
+    Matrices.model *= (translatemat*rotateatorg *toorigin* rotatemat);
+    MVP = VP * Matrices.model;
+    glUniformMatrix4fv(Matrices.MatrixID, 1, GL_FALSE, &MVP[0][0]);
+    draw3DObject(obj);
+}
+
+float dist(float x1,float y1,float z1,float x2,float y2,float z2)
+{
+    int dis=sqrt((x1-x2)*(x1-x2)+(y1-y2)*(y1-y2)+(z1-z2)*(z1-z2));
+    return dis;
+}
+
+int countobj=0;
+int floors[1000];
+int pillars[1000];
 int blocks=10;
 int holes=10;
 int pillarHeight=3;
-int objcount=0;
+int objcount=0,Oiterator=0;
 float camera_rotation_angle = 90;
 float rectangle_rotation = 0;
 float triangle_rotation = 0;
 float rotate_angle=0,ang=0.0f;;
 glm::vec3 rot;
-int heroIndex,rightHandIndex,leftHandIndex;
 bool rotRight=false,rotLeft=false,rotR=false,rotL=false;
 
 /* Render the scene with openGL */
 /* Edit this function according to your assignment */
 void draw ()
 {
+    varang+=1;
     // clear the color and depth in the frame buffer
     glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -627,7 +673,7 @@ void draw ()
     //  Don't change unless you are sure!!
     //eye is position of camera
     //target is position of object
-    Matrices.view = glm::lookAt(glm::vec3(300,300,300), glm::vec3(0,0,0), glm::vec3(0,1,0)); // Fixed camera for 2D (ortho) in XY plane
+    //Matrices.view = glm::lookAt(glm::vec3(300,300,300), glm::vec3(0,0,0), glm::vec3(0,1,0)); // Fixed camera for 2D (ortho) in XY plane
 
     // Compute ViewProject matrix as view/camera might not be changed for this frame (basic scenario)
     //  Don't change unless you are sure!!
@@ -640,28 +686,44 @@ void draw ()
 
     // Load identity to model matrix
     Matrices.model = glm::mat4(1.0f);
-
     /* Render your scene */
+    if(Oiterator==objcount)
+    {
+        Oiterator=0;
+    }
+    if(floors[Oiterator])
+    {
+        if(trans[heroIndex][0]<=-200+Oiterator*40)
+        {
+            cout << "Fall" << endl;
+        }
+    }
     if(leftFlag)
     {
-        trans[heroIndex][0]-=2;
-        trans[rightHandIndex][0]-=2;
-        trans[leftHandIndex][0]-=2;
+        trans[heroIndex][0]-=0.3;
+        trans[rightHandIndex][0]-=0.3;
+        trans[leftHandIndex][0]-=0.3;
+        if(trans[rightHandIndex][0]<=-220)
+        {
+            trans[heroIndex][1]-=0.5;
+            trans[rightHandIndex][1]-=0.5;
+            trans[leftHandIndex][1]-=0.5;
+        }
     }
     if(rightFlag)
     {
-        trans[heroIndex][0]+=2;
-        trans[rightHandIndex][0]+=2;
-        trans[leftHandIndex][0]+=2;
+        trans[heroIndex][0]+=0.3;
+        trans[rightHandIndex][0]+=0.3;
+        trans[leftHandIndex][0]+=0.3;
     }
     if(upFlag)
     {
-        trans[heroIndex][2]-=2;
-        trans[rightHandIndex][2]-=2;
-        trans[leftHandIndex][2]-=2;
+        trans[heroIndex][2]-=0.3;
+        trans[rightHandIndex][2]-=0.3;
+        trans[leftHandIndex][2]-=0.3;
         if(rotat[rightHandIndex]<30 && !rotRight)
         {
-            rotat[rightHandIndex]+=2.0f;
+            rotat[rightHandIndex]+=1.0f;
         }
         if(rotat[rightHandIndex]>=30)
         {
@@ -669,7 +731,7 @@ void draw ()
         }
         if(rotRight)
         {
-            rotat[rightHandIndex]-=2.0f;
+            rotat[rightHandIndex]-=1.0f;
         }
         if(rotat[rightHandIndex]<=-30)
         {
@@ -677,7 +739,7 @@ void draw ()
         }
         if(rotat[leftHandIndex]>=-30 && !rotLeft)
         {
-            rotat[leftHandIndex]-=2.0f;
+            rotat[leftHandIndex]-=1.0f;
         }
         if(rotat[leftHandIndex]<=-30)
         {
@@ -685,7 +747,7 @@ void draw ()
         }
         if(rotLeft)
         {
-            rotat[leftHandIndex]+=2.0f;
+            rotat[leftHandIndex]+=1.0f;
         }
         if(rotat[leftHandIndex]>=30)
         {
@@ -694,12 +756,12 @@ void draw ()
     }
     if(downFlag)
     {
-        trans[heroIndex][2]+=2;
-        trans[rightHandIndex][2]+=2;
-        trans[leftHandIndex][2]+=2;
+        trans[heroIndex][2]+=0.3;
+        trans[rightHandIndex][2]+=0.3;
+        trans[leftHandIndex][2]+=0.3;
         if(rotat[rightHandIndex]>=-30 && !rotR)
         {
-            rotat[rightHandIndex]-=2.0f;
+            rotat[rightHandIndex]-=1.0f;
         }
         if(rotat[rightHandIndex]<=-30)
         {
@@ -707,7 +769,7 @@ void draw ()
         }
         if(rotR)
         {
-            rotat[rightHandIndex]+=2.0f;
+            rotat[rightHandIndex]+=1.0f;
         }
         if(rotat[rightHandIndex]>=30)
         {
@@ -715,7 +777,7 @@ void draw ()
         }
         if(rotat[leftHandIndex]<=30 && !rotL)
         {
-            rotat[leftHandIndex]+=2.0f;
+            rotat[leftHandIndex]+=1.0f;
         }
         if(rotat[leftHandIndex]>=30)
         {
@@ -723,7 +785,7 @@ void draw ()
         }
         if(rotL)
         {
-            rotat[leftHandIndex]-=2.0f;
+            rotat[leftHandIndex]-=1.0f;
         }
         if(rotat[leftHandIndex]<=-30)
         {
@@ -740,8 +802,29 @@ void draw ()
         {
             rot=glm::vec3(0,1,0);
         }
-        drawobject(objects[i],trans[i],rotat[i],rot);
+        if(i!=heroIndex && i!=leftHandIndex && i!=rightHandIndex)
+        {
+            drawobject(objects[i],trans[i],rotat[i],rot);
+        }
+        else
+        {
+            if(leftFlag)
+            {
+                drawHero(objects[i],trans[i],rotat[i],rot,trans[heroIndex],true);
+                heroFlag=true;
+            }
+            if(rightFlag)
+            {
+                drawHero(objects[i],trans[i],rotat[i],rot,trans[heroIndex],false);
+                heroFlag=true;
+            }
+            if(!heroFlag)
+            {
+                drawobject(objects[i],trans[i],rotat[i],rot);
+            }
+        }   
     }
+    Oiterator+=1;
     //drawobject(objects[objcount-2],trans[objcount-2],0.0f,glm::vec3(0,1,0));
     //drawobject(objects[objcount-1],trans[objcount-1],rotate_angle,glm::vec3(1,0,0));
     // Increment angles
@@ -750,6 +833,7 @@ void draw ()
     //camera_rotation_angle++; // Simulating camera rotation
     triangle_rotation = triangle_rotation + increments*triangle_rot_dir*triangle_rot_status;
     rectangle_rotation = rectangle_rotation + increments*rectangle_rot_dir*rectangle_rot_status;
+    countobj+=1;
 }
 
 /* Initialise glfw window, I/O callbacks and the renderer to use */
@@ -833,10 +917,15 @@ void initGL (GLFWwindow* window, int width, int height)
                     {
                         objects[objcount]=createCube(20.0f);
                         trans[objcount]=glm::vec3(numX,pillarY,numZ);
+                        pillars[objcount]=1;
                         rotat[objcount]=0.0f;
                         objcount+=1;
                         pillarY+=40.0f;
                     }
+                }
+                else
+                {
+                    floors[objcount]=1;
                 }
                 numX+=40.0f;
             }
@@ -845,23 +934,24 @@ void initGL (GLFWwindow* window, int width, int height)
         numY+=40.0f;
     }
     //Hero
-    objects[objcount]=createCube(20.0f);
-    trans[objcount]=glm::vec3(-300.0f,200.0f,150.0f);
+    objects[objcount]=createCube(5.0f);
+    trans[objcount]=glm::vec3(0.0f,-60.0f,0.0f);
     heroIndex=objcount;
     rotat[objcount]=0.0f;
     objcount+=1;
     //Hero righthand
-    objects[objcount]=createCuboid(20.0f,40.0f,20.0f);
-    trans[objcount]=glm::vec3(-260.0f,200.0f,150.0f);
+    objects[objcount]=createCuboid(5.0f,15.0f,5.0f);
+    trans[objcount]=glm::vec3(10.0f,-65.0f,0.0f);
     rightHandIndex=objcount;
     rotat[objcount]=0.0f;
     objcount+=1;
     //Hero left hand
-    objects[objcount]=createCuboid(20.0f,40.0f,20.0f);
-    trans[objcount]=glm::vec3(-340.0f,200.0f,150.0f);
+    objects[objcount]=createCuboid(5.0f,15.0f,5.0f);
+    trans[objcount]=glm::vec3(-10.0f,-65.0f,0.0f);
     leftHandIndex=objcount;
     rotat[objcount]=0.0f;
     objcount+=1;
+    Oiterator=objcount;
     // Create and compile our GLSL program from the shaders
     programID = LoadShaders( "Sample_GL.vert", "Sample_GL.frag" );
     // Get a handle for our "MVP" uniform
