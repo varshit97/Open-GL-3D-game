@@ -213,6 +213,8 @@ float movePlayerLeft=0.0f,movePlayerRight=0.0f;
 bool leftFlag=false,rightFlag=false;
 bool upFlag=false,downFlag=false,zoomFlag=false;
 bool heroFlag=false;
+float camAngle=0;
+bool fall=false;
 
 /* Executed when a regular key is pressed/released/held-down */
 /* Prefered for Keyboard events */
@@ -243,10 +245,10 @@ void keyboard (GLFWwindow* window, int key, int scancode, int action, int mods)
                 upFlag=false;
                 break;
             case GLFW_KEY_DOWN:
-                downFlag=false;;
+                downFlag=false;
                 break;
             case GLFW_KEY_Z:
-                zoomFlag=false;;
+                zoomFlag=false;
                 break;
             default:
                 break;
@@ -271,6 +273,9 @@ void keyboard (GLFWwindow* window, int key, int scancode, int action, int mods)
                 break;
             case GLFW_KEY_Z:
                 zoomFlag=true;
+                break;
+            case GLFW_KEY_A:
+                fall=false;
                 break;
             default:
                 break;
@@ -593,11 +598,16 @@ void drawobject(VAO* obj,glm::vec3 trans,float angle,glm::vec3 rotat)
 {
     if(zoomFlag)
     {
-        Matrices.view = glm::lookAt(glm::vec3(0,300,40), glm::vec3(0,0,0), glm::vec3(0,1,0));
+        camAngle+=0.01f;
+        if(camAngle>=360)
+        {
+            camAngle=0;
+        }
+        Matrices.view = glm::lookAt(glm::vec3(700*cos(camAngle*(M_PI/180)),300,700*sin(camAngle*(M_PI/180))), glm::vec3(0,0,0), glm::vec3(0,1,0));
     }
     else
     {
-        Matrices.view = glm::lookAt(glm::vec3(300,400,600), glm::vec3(0,0,0), glm::vec3(0,1,0));
+        Matrices.view = glm::lookAt(glm::vec3(700*cos(camAngle*(M_PI/180)),300,700*sin(camAngle*(M_PI/180))), glm::vec3(0,0,0), glm::vec3(0,1,0));
     }
     glm::mat4 VP = Matrices.projection * Matrices.view;
     glm::mat4 MVP;
@@ -634,10 +644,11 @@ float dist(float x1,float y1,float z1,float x2,float y2,float z2)
 }
 
 int countobj=0;
-int floors[1000];
+glm::vec3 pits[1000];
 int pillars[1000];
 int blocks=10;
 int holes=10;
+int pitCount=0;
 int pillarHeight=3;
 int objcount=0,Oiterator=0;
 float camera_rotation_angle = 90;
@@ -659,11 +670,11 @@ void draw ()
     glUseProgram (programID);
 
     // Eye - Location of camera. Don't change unless you are sure!!
-    glm::vec3 eye ( 5*cos(camera_rotation_angle*M_PI/180.0f), 0, 5*sin(camera_rotation_angle*M_PI/180.0f) );
+    //glm::vec3 eye ( 5*cos(camera_rotation_angle*M_PI/180.0f), 0, 5*sin(camera_rotation_angle*M_PI/180.0f) );
     // Target - Where is the camera looking at.  Don't change unless you are sure!!
-    glm::vec3 target (0, 0, 0);
+    //glm::vec3 target (0, 0, 0);
     // Up - Up vector defines tilt of camera.  Don't change unless you are sure!!
-    glm::vec3 up (0, 1, 0);
+    //glm::vec3 up (0, 1, 0);
 
     //  Don't change unless you are sure!!
     //eye is position of camera
@@ -682,15 +693,25 @@ void draw ()
     // Load identity to model matrix
     Matrices.model = glm::mat4(1.0f);
     /* Render your scene */
-    if(Oiterator==objcount)
+    if(Oiterator==pitCount)
     {
         Oiterator=0;
     }
-    if(floors[Oiterator])
+    if(trans[heroIndex][0]<=pits[Oiterator][0]+20 && trans[heroIndex][0]>=pits[Oiterator][0]-20 && trans[heroIndex][2]<=pits[Oiterator][2]+20 && trans[heroIndex][2]>=pits[Oiterator][2]-20 && !fall)
     {
-        if(trans[heroIndex][0]<=-200+Oiterator*40)
-        {
-        }
+        fall=true;
+    }
+    if(fall)
+    {
+        trans[heroIndex][1]-=0.3;
+        trans[leftHandIndex][1]-=0.3;
+        trans[rightHandIndex][1]-=0.3;
+    }
+    if(trans[heroIndex][0]<=-200 || trans[heroIndex][0]>=200 || trans[heroIndex][2]<=-200 || trans[heroIndex][2]>=200)
+    {
+        trans[heroIndex][1]-=0.5;   
+        trans[leftHandIndex][1]-=0.5;   
+        trans[rightHandIndex][1]-=0.5;   
     }
     if(upFlag)
     {
@@ -905,9 +926,10 @@ void initGL (GLFWwindow* window, int width, int height)
                         pillarY+=40.0f;
                     }
                 }
-                else
+                else if(platform[i][j]==0)
                 {
-                    floors[objcount]=1;
+                    pits[pitCount]=glm::vec3(numX,numY,numZ);
+                    pitCount+=1;
                 }
                 numX+=40.0f;
             }
@@ -933,7 +955,6 @@ void initGL (GLFWwindow* window, int width, int height)
     leftHandIndex=objcount;
     rotat[objcount]=0.0f;
     objcount+=1;
-    Oiterator=objcount;
     // Create and compile our GLSL program from the shaders
     programID = LoadShaders( "Sample_GL.vert", "Sample_GL.frag" );
     // Get a handle for our "MVP" uniform
