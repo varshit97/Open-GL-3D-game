@@ -712,9 +712,12 @@ void draw ()
     }*/
     if(upFlag)
     {
-        trans[heroIndex][2]-=0.3;
-        trans[rightHandIndex][2]-=0.3;
-        trans[leftHandIndex][2]-=0.3;
+        trans[heroIndex][2]-=0.3*cos(varang*(M_PI/180));
+        trans[heroIndex][0]-=0.3*sin(varang*(M_PI/180));
+        trans[rightHandIndex][0]-=0.3*sin(varang*(M_PI/180));
+        trans[rightHandIndex][2]-=0.3*cos(varang*(M_PI/180));
+        trans[leftHandIndex][0]-=0.3*sin(varang*(M_PI/180));
+        trans[leftHandIndex][2]-=0.3*cos(varang*(M_PI/180));
         if(rotat[rightHandIndex]<30 && !rotRight)
         {
             rotat[rightHandIndex]+=1.0f;
@@ -750,9 +753,12 @@ void draw ()
     }
     if(downFlag)
     {
-        trans[heroIndex][2]+=0.3;
-        trans[rightHandIndex][2]+=0.3;
-        trans[leftHandIndex][2]+=0.3;
+        trans[heroIndex][2]+=0.3*cos(varang*(M_PI/180));
+        trans[heroIndex][0]+=0.3*sin(varang*(M_PI/180));
+        trans[rightHandIndex][0]+=0.3*sin(varang*(M_PI/180));
+        trans[rightHandIndex][2]+=0.3*cos(varang*(M_PI/180));
+        trans[leftHandIndex][0]+=0.3*sin(varang*(M_PI/180));
+        trans[leftHandIndex][2]+=0.3*cos(varang*(M_PI/180));
         if(rotat[rightHandIndex]>=-30 && !rotR)
         {
             rotat[rightHandIndex]-=1.0f;
