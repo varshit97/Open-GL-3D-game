@@ -697,14 +697,14 @@ glm::vec3 pillars[1000];
 int blocks=10;
 int holes=10;
 int pitCount=0,pillCount=0;
-int pillarHeight=3;
+int pillarHeight=1;
 int objcount=0,Oiterator=0,PillIterator=0;
 float camera_rotation_angle = 90;
 float rectangle_rotation = 0;
 float triangle_rotation = 0;
 float rotate_angle=0,ang=0.0f;;
 glm::vec3 rot;
-bool stop=false;
+bool stop=false,stop1=false;
 bool rotRight=false,rotLeft=false,rotR=false,rotL=false;
 
 /* Render the scene with openGL */
@@ -769,14 +769,21 @@ void draw ()
         trans[leftHandIndex][1]-=0.5;   
         trans[rightHandIndex][1]-=0.5;   
     }
-    cout << "diff " << trans[heroIndex][0]-pillars[PillIterator][0] << endl;
-    if(round(trans[heroIndex][0]-pillars[PillIterator][0])==25)
+    float pillX=trans[heroIndex][0]-pillars[PillIterator][0];
+    float pillY=trans[heroIndex][1]-pillars[PillIterator][1];
+    float pillZ=trans[heroIndex][2]-pillars[PillIterator][2];
+    float distance=sqrt((pillX*pillX)+(pillY*pillY)+(pillZ*pillZ));
+    if(distance<=52)
     {
         upFlag=false;
         stop=true;
     }
     if(upFlag && !stop)
     {
+        if(stop1)
+        {
+            stop1=false;
+        }
         trans[heroIndex][2]-=0.3*cos(varang*(M_PI/180));
         trans[heroIndex][0]-=0.3*sin(varang*(M_PI/180));
         trans[rightHandIndex][0]-=0.3*sin(varang*(M_PI/180));
@@ -816,8 +823,12 @@ void draw ()
             rotLeft=false;
         }
     }
-    if(downFlag)
+    if(downFlag && !stop1)
     {
+        if(stop)
+        {
+            stop=false;
+        }
         trans[heroIndex][2]+=0.3*cos(varang*(M_PI/180));
         trans[heroIndex][0]+=0.3*sin(varang*(M_PI/180));
         trans[rightHandIndex][0]+=0.3*sin(varang*(M_PI/180));
