@@ -655,7 +655,9 @@ void drawobject(VAO* obj,glm::vec3 trans,float angle,glm::vec3 rotat)
     }
     if(headCamFlag)
     {
-        Matrices.view = glm::lookAt(glm::vec3(x,y,z+20), glm::vec3(x,y,z+50), glm::vec3(0,1,0));
+        float lookX=40*cos(varang*(M_PI/180));
+        float lookY=40*sin(varang*(M_PI/180));
+        Matrices.view = glm::lookAt(glm::vec3(x,y+40,z), glm::vec3(x+lookX,y+40,z+lookY), glm::vec3(0,1,0));
     }
     glm::mat4 VP = Matrices.projection * Matrices.view;
     glm::mat4 MVP;
@@ -702,6 +704,7 @@ float rectangle_rotation = 0;
 float triangle_rotation = 0;
 float rotate_angle=0,ang=0.0f;;
 glm::vec3 rot;
+bool stop=false;
 bool rotRight=false,rotLeft=false,rotR=false,rotL=false;
 
 /* Render the scene with openGL */
@@ -766,9 +769,13 @@ void draw ()
         trans[leftHandIndex][1]-=0.5;   
         trans[rightHandIndex][1]-=0.5;   
     }
-    cout << "hero X " << trans[heroIndex][0]-pillars[PillIterator][0] << endl;
-    cout << "hero Z " << trans[heroIndex][2]-pillars[PillIterator][2] << endl;
-    if(upFlag && (trans[heroIndex][0]-pillars[PillIterator][0]>=25 || trans[heroIndex][0]-pillars[PillIterator][0]<=-25) && (trans[heroIndex][2]-pillars[PillIterator][2]>=25 || trans[heroIndex][2]-pillars[PillIterator][2]<=-25))
+    cout << "diff " << trans[heroIndex][0]-pillars[PillIterator][0] << endl;
+    if(round(trans[heroIndex][0]-pillars[PillIterator][0])==25)
+    {
+        upFlag=false;
+        stop=true;
+    }
+    if(upFlag && !stop)
     {
         trans[heroIndex][2]-=0.3*cos(varang*(M_PI/180));
         trans[heroIndex][0]-=0.3*sin(varang*(M_PI/180));
@@ -809,7 +816,7 @@ void draw ()
             rotLeft=false;
         }
     }
-    if(downFlag && (trans[heroIndex][0]-pillars[PillIterator][0]>=25 || trans[heroIndex][0]-pillars[PillIterator][0]<=-25) && (trans[heroIndex][2]-pillars[PillIterator][2]>=25 || trans[heroIndex][2]-pillars[PillIterator][2]<=-25))
+    if(downFlag)
     {
         trans[heroIndex][2]+=0.3*cos(varang*(M_PI/180));
         trans[heroIndex][0]+=0.3*sin(varang*(M_PI/180));
