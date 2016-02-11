@@ -366,7 +366,7 @@ void keyboard (GLFWwindow* window, int key, int scancode, int action, int mods)
                 break;
             case GLFW_KEY_SPACE:
                 jumpFlag=true;
-                thread(play_audio,"/home/varshit/jump_01.mp3").detach();
+                //thread(play_audio,"/home/varshit/jump_01.mp3").detach();
                 break;
             default:
                 break;
@@ -880,7 +880,7 @@ void draw ()
       trans[heroIndex][1]-=trans[leftHandIndex][1]+5;
       }
       }*/
-    thread(play_audio,"/home/varshit/jump_01.mp3").detach();
+    //thread(play_audio,"/home/varshit/jump_01.mp3").detach();
     for(int j=0;j<100;j++)
     {
         if(round(trans[heroIndex][0])>trans[j][0]-20 && round(trans[heroIndex][0])<trans[j][0]+20 && round(trans[heroIndex][2])>trans[j][2]-20 && round(trans[heroIndex][2])<trans[j][2]+20)
@@ -1074,7 +1074,7 @@ void draw ()
     for(int j=coinStart;j<objcount;j++)
     {
         rotat[j]+=0.5;
-        if(round(trans[heroIndex][0])==trans[j][0])
+        if(round(trans[heroIndex][0])==trans[j][0] && round(trans[heroIndex][2]==trans[j][2])
         {
             coinVanish[j]=true;
         }
@@ -1239,6 +1239,12 @@ void initGL (GLFWwindow* window, int width, int height)
     trans[objcount]=glm::vec3(100.0f,-80.0f,140.0f);
     rotat[objcount]=0.0f;
     coinPos[objcount]=1;
+    objcount+=1;
+
+    objects[objcount]=createPyramid(20,40);
+    trans[objcount]=glm::vec3(200.0f,-80.0f,160.0f);
+    rotat[objcount]=0.0f;
+    //coinPos[objcount]=1;
     objcount+=1;
 
     // Create and compile our GLSL program from the shaders
