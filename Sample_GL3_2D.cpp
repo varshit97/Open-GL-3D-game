@@ -883,7 +883,7 @@ void draw ()
     thread(play_audio,"/home/varshit/jump_01.mp3").detach();
     for(int j=0;j<100;j++)
     {
-        if(round(trans[heroIndex][0])>trans[j][0]-20 && round(trans[heroIndex][0])<trans[j][0]+20)
+        if(round(trans[heroIndex][0])>trans[j][0]-20 && round(trans[heroIndex][0])<trans[j][0]+20 && round(trans[heroIndex][2])>trans[j][2]-20 && round(trans[heroIndex][2])<trans[j][2]+20)
         {
             objects[j]=createCube(20.0f,0.7f);
         }
