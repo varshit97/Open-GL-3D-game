@@ -15,6 +15,20 @@
 
 using namespace std;
 
+#include<bits/stdc++.h>
+#include <ao/ao.h>
+#include <mpg123.h>
+
+using namespace std;
+#define ll long long
+#define mp(x,y) make_pair(x,y)
+#define pr pair<int,int>
+#define F first
+#define S second
+#define pb push_back
+
+#define BITS 8
+
 struct VAO {
     GLuint VertexArrayID;
     GLuint VertexBuffer;
@@ -216,6 +230,54 @@ bool heroFlag=false,zoom1Flag=false,jumpFlag=false;
 float camAngle=0;
 bool fall=false,topFlag=false,followFlag=false,headCamFlag=false;
 
+
+void *play_audio(string audioFile)
+{
+    mpg123_handle *mh;
+    unsigned char *buffer;
+    size_t buffer_size;
+    size_t done;
+    int err;
+
+    int driver;
+    ao_device *dev;
+
+    ao_sample_format format;
+    int channels, encoding;
+    long rate;
+
+    /* initializations */
+    ao_initialize();
+    driver = ao_default_driver_id();
+    mpg123_init();
+    mh = mpg123_new(NULL, &err);
+    buffer_size = mpg123_outblock(mh);
+    buffer = (unsigned char*) malloc(buffer_size * sizeof(unsigned char));
+
+    /* open the file and get the decoding format */
+    mpg123_open(mh, &audioFile[0]);
+    mpg123_getformat(mh, &rate, &channels, &encoding);
+
+    /* set the output format and open the output device */
+    format.bits = mpg123_encsize(encoding) * 8;
+    format.rate = rate;
+    format.channels = channels;
+    format.byte_format = AO_FMT_NATIVE;
+    format.matrix = 0;
+    dev = ao_open_live(driver, &format, NULL);
+
+    /* decode and play */
+    char *p =(char *)buffer;
+    while (mpg123_read(mh, buffer, buffer_size, &done) == MPG123_OK)
+        ao_play(dev, p, done);
+
+    /* clean up */
+    free(buffer);
+    ao_close(dev);
+    mpg123_close(mh);
+    mpg123_delete(mh);
+}
+
 /* Executed when a regular key is pressed/released/held-down */
 /* Prefered for Keyboard events */
 void keyboard (GLFWwindow* window, int key, int scancode, int action, int mods)
@@ -260,6 +322,7 @@ void keyboard (GLFWwindow* window, int key, int scancode, int action, int mods)
                 zoom1Flag=false;
                 break;
             case GLFW_KEY_SPACE:
+                //play_audio("jump_01.mp3");
                 jumpFlag=false;
                 break;
             default:
@@ -303,6 +366,7 @@ void keyboard (GLFWwindow* window, int key, int scancode, int action, int mods)
                 break;
             case GLFW_KEY_SPACE:
                 jumpFlag=true;
+                play_audio("jump_01.mp3");
                 break;
             default:
                 break;
@@ -362,7 +426,7 @@ void reshapeWindow (GLFWwindow* window, int width, int height)
        gluPerspective (fov, (GLfloat) fbwidth / (GLfloat) fbheight, 0.1, 500.0); */
     // Store the projection matrix in a variable for future use
     // Perspective projection for 3D views
-     Matrices.projection = glm::perspective (fov, (GLfloat) fbwidth / (GLfloat) fbheight, 0.1f, 1200.0f);
+    Matrices.projection = glm::perspective (fov, (GLfloat) fbwidth / (GLfloat) fbheight, 0.1f, 1200.0f);
 
     // Ortho projection for 2D views
     //Matrices.projection = glm::ortho(-400.0f, 400.0f, -300.0f, 300.0f, 0.1f, 1200.0f);
@@ -386,7 +450,7 @@ glm::vec3 trans[1000];
 float rotat[1000];
 VAO* objects[1000];
 VAO *triangle,*rectangle,*cube,*pyramid;
-int platform[10][10];
+int platform[11][12];
 
 // Creates the triangle object used in this sample code
 void createTriangle ()
@@ -535,47 +599,47 @@ VAO* createCube(float side)
     };
 
     GLfloat color_buffer_data [] = {
-     0.583f,  0.771f,  0.014f,
-     0.609f,  0.115f,  0.436f,
-     0.327f,  0.483f,  0.844f,
-     0.822f,  0.569f,  0.201f,
-     0.435f,  0.602f,  0.223f,
-     0.310f,  0.747f,  0.185f,
+        0.583f,  0.771f,  0.014f,
+        0.609f,  0.115f,  0.436f,
+        0.327f,  0.483f,  0.844f,
+        0.822f,  0.569f,  0.201f,
+        0.435f,  0.602f,  0.223f,
+        0.310f,  0.747f,  0.185f,
 
-     0.597f,  0.770f,  0.761f,
-     0.559f,  0.436f,  0.730f,
-     0.359f,  0.583f,  0.152f,
-     0.483f,  0.596f,  0.789f,
-     0.559f,  0.861f,  0.639f,
-     0.195f,  0.548f,  0.859f,
+        0.597f,  0.770f,  0.761f,
+        0.559f,  0.436f,  0.730f,
+        0.359f,  0.583f,  0.152f,
+        0.483f,  0.596f,  0.789f,
+        0.559f,  0.861f,  0.639f,
+        0.195f,  0.548f,  0.859f,
 
-     0.014f,  0.184f,  0.576f,
-     0.771f,  0.328f,  0.970f,
-     0.406f,  0.615f,  0.116f,
-     0.676f,  0.977f,  0.133f,
-     0.971f,  0.572f,  0.833f,
-     0.140f,  0.616f,  0.489f,
+        0.014f,  0.184f,  0.576f,
+        0.771f,  0.328f,  0.970f,
+        0.406f,  0.615f,  0.116f,
+        0.676f,  0.977f,  0.133f,
+        0.971f,  0.572f,  0.833f,
+        0.140f,  0.616f,  0.489f,
 
-     0.997f,  0.513f,  0.064f,
-     0.945f,  0.719f,  0.592f,
-     0.543f,  0.021f,  0.978f,
-     0.279f,  0.317f,  0.505f,
-     0.167f,  0.620f,  0.077f,
-     0.347f,  0.857f,  0.137f,
+        0.997f,  0.513f,  0.064f,
+        0.945f,  0.719f,  0.592f,
+        0.543f,  0.021f,  0.978f,
+        0.279f,  0.317f,  0.505f,
+        0.167f,  0.620f,  0.077f,
+        0.347f,  0.857f,  0.137f,
 
-     0.055f,  0.953f,  0.042f,
-     0.714f,  0.505f,  0.345f,
-     0.783f,  0.290f,  0.734f,
-     0.722f,  0.645f,  0.174f,
-     0.302f,  0.455f,  0.848f,
-     0.225f,  0.587f,  0.040f,
+        0.055f,  0.953f,  0.042f,
+        0.714f,  0.505f,  0.345f,
+        0.783f,  0.290f,  0.734f,
+        0.722f,  0.645f,  0.174f,
+        0.302f,  0.455f,  0.848f,
+        0.225f,  0.587f,  0.040f,
 
-     0.517f,  0.713f,  0.338f,
-     0.053f,  0.959f,  0.120f,
-     0.393f,  0.621f,  0.362f,
-     0.673f,  0.211f,  0.457f,
-     0.820f,  0.883f,  0.371f,
-     0.982f,  0.099f,  0.879f
+        0.517f,  0.713f,  0.338f,
+        0.053f,  0.959f,  0.120f,
+        0.393f,  0.621f,  0.362f,
+        0.673f,  0.211f,  0.457f,
+        0.820f,  0.883f,  0.371f,
+        0.982f,  0.099f,  0.879f
 
     };
 
@@ -587,7 +651,7 @@ VAO* createCube(float side)
 VAO* createCuboid(float side1,float side2,float side3)
 {
     // GL3 accepts only Triangles. Quads are not supported
-GLfloat vertex_buffer_data [] = {
+    GLfloat vertex_buffer_data [] = {
         -side1,-side2,-side3, // triangle 1 : begin
         -side1,-side2, side3,
         -side1, side2, side3, // triangle 1 : end
@@ -627,47 +691,47 @@ GLfloat vertex_buffer_data [] = {
     };
 
     GLfloat color_buffer_data [] = {
-     0.583f,  0.771f,  0.014f,
-     0.609f,  0.115f,  0.436f,
-     0.327f,  0.483f,  0.844f,
-     0.822f,  0.569f,  0.201f,
-     0.435f,  0.602f,  0.223f,
-     0.310f,  0.747f,  0.185f,
+        0.583f,  0.771f,  0.014f,
+        0.609f,  0.115f,  0.436f,
+        0.327f,  0.483f,  0.844f,
+        0.822f,  0.569f,  0.201f,
+        0.435f,  0.602f,  0.223f,
+        0.310f,  0.747f,  0.185f,
 
-     0.597f,  0.770f,  0.761f,
-     0.559f,  0.436f,  0.730f,
-     0.359f,  0.583f,  0.152f,
-     0.483f,  0.596f,  0.789f,
-     0.559f,  0.861f,  0.639f,
-     0.195f,  0.548f,  0.859f,
+        0.597f,  0.770f,  0.761f,
+        0.559f,  0.436f,  0.730f,
+        0.359f,  0.583f,  0.152f,
+        0.483f,  0.596f,  0.789f,
+        0.559f,  0.861f,  0.639f,
+        0.195f,  0.548f,  0.859f,
 
-     0.014f,  0.184f,  0.576f,
-     0.771f,  0.328f,  0.970f,
-     0.406f,  0.615f,  0.116f,
-     0.676f,  0.977f,  0.133f,
-     0.971f,  0.572f,  0.833f,
-     0.140f,  0.616f,  0.489f,
+        0.014f,  0.184f,  0.576f,
+        0.771f,  0.328f,  0.970f,
+        0.406f,  0.615f,  0.116f,
+        0.676f,  0.977f,  0.133f,
+        0.971f,  0.572f,  0.833f,
+        0.140f,  0.616f,  0.489f,
 
-     0.997f,  0.513f,  0.064f,
-     0.945f,  0.719f,  0.592f,
-     0.543f,  0.021f,  0.978f,
-     0.279f,  0.317f,  0.505f,
-     0.167f,  0.620f,  0.077f,
-     0.347f,  0.857f,  0.137f,
+        0.997f,  0.513f,  0.064f,
+        0.945f,  0.719f,  0.592f,
+        0.543f,  0.021f,  0.978f,
+        0.279f,  0.317f,  0.505f,
+        0.167f,  0.620f,  0.077f,
+        0.347f,  0.857f,  0.137f,
 
-     0.055f,  0.953f,  0.042f,
-     0.714f,  0.505f,  0.345f,
-     0.783f,  0.290f,  0.734f,
-     0.722f,  0.645f,  0.174f,
-     0.302f,  0.455f,  0.848f,
-     0.225f,  0.587f,  0.040f,
+        0.055f,  0.953f,  0.042f,
+        0.714f,  0.505f,  0.345f,
+        0.783f,  0.290f,  0.734f,
+        0.722f,  0.645f,  0.174f,
+        0.302f,  0.455f,  0.848f,
+        0.225f,  0.587f,  0.040f,
 
-     0.517f,  0.713f,  0.338f,
-     0.053f,  0.959f,  0.120f,
-     0.393f,  0.621f,  0.362f,
-     0.673f,  0.211f,  0.457f,
-     0.820f,  0.883f,  0.371f,
-     0.982f,  0.099f,  0.879f
+        0.517f,  0.713f,  0.338f,
+        0.053f,  0.959f,  0.120f,
+        0.393f,  0.621f,  0.362f,
+        0.673f,  0.211f,  0.457f,
+        0.820f,  0.883f,  0.371f,
+        0.982f,  0.099f,  0.879f
 
     };
 
@@ -806,6 +870,16 @@ void draw ()
     y=trans[heroIndex][1];
     z=trans[heroIndex][2];
     /* Render your scene */
+    /*for(int i=0;i<objcount;i++)
+      {
+      if(trans[rightHandIndex][1]+35>=trans[i][1] && i!=heroIndex && i!=leftHandIndex && i!=rightHandIndex)
+      {
+      cout << "hello " << trans[rightHandIndex][1] << " " << trans[i][1] << endl;
+      trans[rightHandIndex][1]-=trans[rightHandIndex][1]-trans[i][1];
+      trans[leftHandIndex][1]-=trans[rightHandIndex][1]-trans[i][1];
+      trans[heroIndex][1]-=trans[leftHandIndex][1]+5;
+      }
+      }*/
     if(jumpFlag && trans[heroIndex][1]<=-20)
     {
         trans[heroIndex][1]+=0.8;
@@ -849,6 +923,8 @@ void draw ()
     if(distance<=52)
     {
         upFlag=false;
+        leftFlag=false;
+        rightFlag=false;
         stop=true;
     }
     if(upFlag && !stop)
@@ -865,38 +941,38 @@ void draw ()
         trans[leftHandIndex][2]-=0.3*cos(varang*(M_PI/180));
         if(!jumpFlag)
         {
-        if(rotat[rightHandIndex]<30 && !rotRight)
-        {
-            rotat[rightHandIndex]+=1.0f;
-        }
-        if(rotat[rightHandIndex]>=30)
-        {
-            rotRight=true;
-        }
-        if(rotRight)
-        {
-            rotat[rightHandIndex]-=1.0f;
-        }
-        if(rotat[rightHandIndex]<=-30)
-        {
-            rotRight=false;
-        }
-        if(rotat[leftHandIndex]>=-30 && !rotLeft)
-        {
-            rotat[leftHandIndex]-=1.0f;
-        }
-        if(rotat[leftHandIndex]<=-30)
-        {
-            rotLeft=true;
-        }
-        if(rotLeft)
-        {
-            rotat[leftHandIndex]+=1.0f;
-        }
-        if(rotat[leftHandIndex]>=30)
-        {
-            rotLeft=false;
-        }
+            if(rotat[rightHandIndex]<30 && !rotRight)
+            {
+                rotat[rightHandIndex]+=1.0f;
+            }
+            if(rotat[rightHandIndex]>=30)
+            {
+                rotRight=true;
+            }
+            if(rotRight)
+            {
+                rotat[rightHandIndex]-=1.0f;
+            }
+            if(rotat[rightHandIndex]<=-30)
+            {
+                rotRight=false;
+            }
+            if(rotat[leftHandIndex]>=-30 && !rotLeft)
+            {
+                rotat[leftHandIndex]-=1.0f;
+            }
+            if(rotat[leftHandIndex]<=-30)
+            {
+                rotLeft=true;
+            }
+            if(rotLeft)
+            {
+                rotat[leftHandIndex]+=1.0f;
+            }
+            if(rotat[leftHandIndex]>=30)
+            {
+                rotLeft=false;
+            }
         }
     }
     if(downFlag && !stop1 && !jumpFlag)
@@ -913,38 +989,38 @@ void draw ()
         trans[leftHandIndex][2]+=0.3*cos(varang*(M_PI/180));
         if(!jumpFlag)
         {
-        if(rotat[rightHandIndex]>=-30 && !rotR)
-        {
-            rotat[rightHandIndex]-=1.0f;
-        }
-        if(rotat[rightHandIndex]<=-30)
-        {
-            rotR=true;
-        }
-        if(rotR)
-        {
-            rotat[rightHandIndex]+=1.0f;
-        }
-        if(rotat[rightHandIndex]>=30)
-        {
-            rotR=false;
-        }
-        if(rotat[leftHandIndex]<=30 && !rotL)
-        {
-            rotat[leftHandIndex]+=1.0f;
-        }
-        if(rotat[leftHandIndex]>=30)
-        {
-            rotL=true;
-        }
-        if(rotL)
-        {
-            rotat[leftHandIndex]-=1.0f;
-        }
-        if(rotat[leftHandIndex]<=-30)
-        {
-            rotL=false;
-        }
+            if(rotat[rightHandIndex]>=-30 && !rotR)
+            {
+                rotat[rightHandIndex]-=1.0f;
+            }
+            if(rotat[rightHandIndex]<=-30)
+            {
+                rotR=true;
+            }
+            if(rotR)
+            {
+                rotat[rightHandIndex]+=1.0f;
+            }
+            if(rotat[rightHandIndex]>=30)
+            {
+                rotR=false;
+            }
+            if(rotat[leftHandIndex]<=30 && !rotL)
+            {
+                rotat[leftHandIndex]+=1.0f;
+            }
+            if(rotat[leftHandIndex]>=30)
+            {
+                rotL=true;
+            }
+            if(rotL)
+            {
+                rotat[leftHandIndex]-=1.0f;
+            }
+            if(rotat[leftHandIndex]<=-30)
+            {
+                rotL=false;
+            }
         }
     }
     for(int i=0;i<objcount;i++)
@@ -1067,7 +1143,7 @@ void initGL (GLFWwindow* window, int width, int height)
         for(int i=0;i<blocks;i++)
         {
             float numX=-200.0f;
-            for(int j=0;j<10;j++)
+            for(int j=0;j<11;j++)
             {
                 //floor
                 if(platform[i][j]==1)
@@ -1184,26 +1260,26 @@ int main (int argc, char** argv)
 
     GLFWwindow* window = initGLFW(width, height);
     //Map
-    for(int i=0;i<10;i++)
+    for(int i=0;i<11;i++)
     {
-        for(int j=0;j<10;j++)
+        for(int j=0;j<12;j++)
         {
             platform[i][j]=1;
         }
     }
     //Pits
     //for(int i=0;i<holes;i++)
-   // {
-   //     int fall1=rand()%10;
-   //     int fall2=rand()%10;
-        //platform[8][2]=0;
-        platform[1][1]=0;
+    // {
+    //     int fall1=rand()%10;
+    //     int fall2=rand()%10;
+    //platform[8][2]=0;
+    platform[1][1]=0;
     //    platform[2][3]=0;
     //    platform[3][4]=0;
     //    platform[6][2]=0;
     //    platform[9][2]=0;
-   // }
-   // Walls
+    // }
+    // Walls
     platform[2][3]=2;
     platform[2][4]=2;
     platform[2][5]=2;
@@ -1213,11 +1289,11 @@ int main (int argc, char** argv)
     platform[3][5]=2;
     platform[4][5]=2;
     platform[5][5]=2;
-    platform[7][2]=2;
-    platform[6][2]=2;
-    platform[5][2]=2;
-    platform[4][2]=2;
-    platform[3][2]=2;
+    platform[7][2]=1;
+    platform[6][2]=1;
+    platform[5][2]=1;
+    platform[4][2]=1;
+    platform[3][2]=1;
     platform[2][2]=2;
     platform[3][8]=2;
     platform[4][8]=2;
