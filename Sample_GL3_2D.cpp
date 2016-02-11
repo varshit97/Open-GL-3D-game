@@ -764,9 +764,9 @@ float rectangle_rotation = 0;
 float triangle_rotation = 0;
 float rotate_angle=0,ang=0.0f;;
 glm::vec3 rot;
-bool stop=false,stop1=false;
+bool stop=false,stop1=false,coinVanish[1000]={false},coinPos[1000];
 bool rotRight=false,rotLeft=false,rotR=false,rotL=false;
-int coinIndex;
+int coinStart;
 
 /* Render the scene with openGL */
 /* Edit this function according to your assignment */
@@ -806,7 +806,7 @@ void draw ()
     y=trans[heroIndex][1];
     z=trans[heroIndex][2];
     /* Render your scene */
-    if(jumpFlag && trans[heroIndex][1]<=-25)
+    if(jumpFlag && trans[heroIndex][1]<=-20)
     {
         trans[heroIndex][1]+=0.8;
         trans[leftHandIndex][1]+=0.8;
@@ -959,9 +959,9 @@ void draw ()
         }
         if(i!=heroIndex && i!=leftHandIndex && i!=rightHandIndex)
         {
-            if(i==coinIndex)
+            if(coinVanish[i])
             {
-                rotat[i]+=1;
+                continue;
             }
             drawobject(objects[i],trans[i],rotat[i],rot);
         }
@@ -981,7 +981,15 @@ void draw ()
             {
                 drawHero(objects[i],trans[i],rotat[i],rot,trans[heroIndex]);
             }
-        }   
+        }  
+    }
+    for(int j=coinStart;j<objcount;j++)
+    {
+        rotat[j]+=0.5;
+        if(round(trans[heroIndex][0])==trans[j][0])
+        {
+            coinVanish[j]=true;
+        }
     }
     Oiterator+=1;
     PillIterator+=1;
@@ -1117,8 +1125,37 @@ void initGL (GLFWwindow* window, int width, int height)
     objects[objcount]=createPyramid(10,20);
     trans[objcount]=glm::vec3(-100.0f,-80.0f,140.0f);
     rotat[objcount]=0.0f;
-    coinIndex=objcount;
+    coinPos[objcount]=1;
+    coinStart=objcount;
     objcount+=1;
+
+    objects[objcount]=createPyramid(10,20);
+    trans[objcount]=glm::vec3(-50.0f,-80.0f,140.0f);
+    rotat[objcount]=0.0f;
+    coinPos[objcount]=1;
+    objcount+=1;
+
+    objects[objcount]=createPyramid(10,20);
+    trans[objcount]=glm::vec3(0.0f,-80.0f,140.0f);
+    rotat[objcount]=0.0f;
+    coinPos[objcount]=1;
+    objcount+=1;
+
+    objects[objcount]=createPyramid(10,20);
+    trans[objcount]=glm::vec3(50.0f,-80.0f,140.0f);
+    rotat[objcount]=0.0f;
+    coinPos[objcount]=1;
+    objcount+=1;
+
+    objects[objcount]=createPyramid(10,20);
+    trans[objcount]=glm::vec3(100.0f,-80.0f,140.0f);
+    rotat[objcount]=0.0f;
+    coinPos[objcount]=1;
+    objcount+=1;
+
+    // Create and compile our GLSL program from the shaders
+    // Create and compile our GLSL program from the shaders
+
     // Create and compile our GLSL program from the shaders
     programID = LoadShaders( "Sample_GL.vert", "Sample_GL.frag" );
     // Get a handle for our "MVP" uniform
