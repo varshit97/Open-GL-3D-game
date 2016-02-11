@@ -808,6 +808,8 @@ void draw ()
         trans[rightHandIndex][2]-=0.3*cos(varang*(M_PI/180));
         trans[leftHandIndex][0]-=0.3*sin(varang*(M_PI/180));
         trans[leftHandIndex][2]-=0.3*cos(varang*(M_PI/180));
+        if(!jumpFlag)
+        {
         if(rotat[rightHandIndex]<30 && !rotRight)
         {
             rotat[rightHandIndex]+=1.0f;
@@ -840,8 +842,9 @@ void draw ()
         {
             rotLeft=false;
         }
+        }
     }
-    if(downFlag && !stop1)
+    if(downFlag && !stop1 && !jumpFlag)
     {
         if(stop)
         {
@@ -853,6 +856,8 @@ void draw ()
         trans[rightHandIndex][2]+=0.3*cos(varang*(M_PI/180));
         trans[leftHandIndex][0]+=0.3*sin(varang*(M_PI/180));
         trans[leftHandIndex][2]+=0.3*cos(varang*(M_PI/180));
+        if(!jumpFlag)
+        {
         if(rotat[rightHandIndex]>=-30 && !rotR)
         {
             rotat[rightHandIndex]-=1.0f;
@@ -884,6 +889,7 @@ void draw ()
         if(rotat[leftHandIndex]<=-30)
         {
             rotL=false;
+        }
         }
     }
     for(int i=0;i<objcount;i++)
@@ -1032,19 +1038,19 @@ void initGL (GLFWwindow* window, int width, int height)
     }
     //Hero
     objects[objcount]=createCube(5.0f);
-    trans[objcount]=glm::vec3(0.0f,-60.0f,0.0f);
+    trans[objcount]=glm::vec3(-140.0f,-60.0f,140.0f);
     heroIndex=objcount;
     rotat[objcount]=0.0f;
     objcount+=1;
     //Hero righthand
     objects[objcount]=createCuboid(5.0f,15.0f,5.0f);
-    trans[objcount]=glm::vec3(10.0f,-65.0f,0.0f);
+    trans[objcount]=glm::vec3(-130.0f,-65.0f,140.0f);
     rightHandIndex=objcount;
     rotat[objcount]=0.0f;
     objcount+=1;
     //Hero left hand
     objects[objcount]=createCuboid(5.0f,15.0f,5.0f);
-    trans[objcount]=glm::vec3(-10.0f,-65.0f,0.0f);
+    trans[objcount]=glm::vec3(-150.0f,-65.0f,140.0f);
     leftHandIndex=objcount;
     rotat[objcount]=0.0f;
     objcount+=1;
@@ -1088,17 +1094,33 @@ int main (int argc, char** argv)
    // {
    //     int fall1=rand()%10;
    //     int fall2=rand()%10;
-        platform[1][2]=0;
-        platform[2][3]=0;
-        platform[3][4]=0;
-        platform[6][2]=0;
-        platform[9][2]=0;
+    //    platform[1][2]=0;
+    //    platform[2][3]=0;
+    //    platform[3][4]=0;
+    //    platform[6][2]=0;
+    //    platform[9][2]=0;
    // }
    // Walls
-    platform[1][5]=2;
+    platform[2][3]=2;
+    platform[2][4]=2;
+    platform[2][5]=2;
+    platform[2][6]=2;
+    platform[2][7]=2;
     platform[2][8]=2;
-    platform[3][7]=2;
-    platform[6][6]=2;
+    platform[3][5]=2;
+    platform[4][5]=2;
+    platform[5][5]=2;
+    platform[7][2]=2;
+    platform[6][2]=2;
+    platform[5][2]=2;
+    platform[4][2]=2;
+    platform[3][2]=2;
+    platform[2][2]=2;
+    platform[3][8]=2;
+    platform[4][8]=2;
+    platform[5][8]=2;
+    platform[6][8]=2;
+    platform[7][8]=2;
     initGL (window, width, height);
 
     double last_update_time = glfwGetTime(), current_time;
