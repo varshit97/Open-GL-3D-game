@@ -385,7 +385,7 @@ float D2R(float A)
 glm::vec3 trans[1000];
 float rotat[1000];
 VAO* objects[1000];
-VAO *triangle,*rectangle,*cube;
+VAO *triangle,*rectangle,*cube,*pyramid;
 int platform[10][10];
 
 // Creates the triangle object used in this sample code
@@ -436,6 +436,60 @@ void createRectangle ()
 
     // create3DObject creates and returns a handle to a VAO that can be used later
     rectangle = create3DObject(GL_TRIANGLES, 6, vertex_buffer_data, color_buffer_data, GL_FILL);
+}
+
+VAO *createPyramid(float length,float height)
+{
+    GLfloat vertex_buffer_data[]={
+        -length,0,length,
+        -length,0,-length,
+        length,0,length,
+        length,0,length,
+        length,0,-length,
+        -length,0,-length,
+        -length,0,length,
+        -length,0,-length,
+        0,height,0,
+        -length,0,length,
+        length,0,length,
+        0,height,0,
+        length,0,length,
+        length,0,-length,
+        0,height,0,
+        length,0,-length,
+        -length,0,-length,
+        0,height,0
+    };
+    GLfloat color_buffer_data [] = {
+        1,0,0, // color 1
+        0,0,1, // color 2
+        0,1,0, // color 3
+
+        0,1,0, // color 3
+        0.3,0.3,0.3, // color 4
+        1,0,0,  // color 1
+
+        0,1,0, // color 3
+        0.3,0.3,0.3, // color 4
+        1,0,0,  // color 1
+
+        0,1,0, // color 3
+        0.3,0.3,0.3, // color 4
+        1,0,0,  // color 1
+
+        0,1,0, // color 3
+        0.3,0.3,0.3, // color 4
+        1,0,0,  // color 1
+
+        0,1,0, // color 3
+        0.3,0.3,0.3, // color 4
+        1,0,0,  // color 1
+
+        0,1,0, // color 3
+        0.3,0.3,0.3, // color 4
+        1,0,0  // color 1
+    };
+    pyramid = create3DObject(GL_TRIANGLES, 18, vertex_buffer_data, color_buffer_data, GL_FILL);
 }
 
 VAO* createCube(float side)
@@ -1054,6 +1108,11 @@ void initGL (GLFWwindow* window, int width, int height)
     leftHandIndex=objcount;
     rotat[objcount]=0.0f;
     objcount+=1;
+    //Coins
+    objects[objcount]=createPyramid(20,40);
+    trans[objcount]=glm::vec3(0.0f,100.0f,100.0f);
+    rotat[objcount]=0.0f;
+    objcount+=1;
     // Create and compile our GLSL program from the shaders
     programID = LoadShaders( "Sample_GL.vert", "Sample_GL.frag" );
     // Get a handle for our "MVP" uniform
@@ -1094,7 +1153,8 @@ int main (int argc, char** argv)
    // {
    //     int fall1=rand()%10;
    //     int fall2=rand()%10;
-    //    platform[1][2]=0;
+        //platform[8][2]=0;
+        platform[1][1]=0;
     //    platform[2][3]=0;
     //    platform[3][4]=0;
     //    platform[6][2]=0;
