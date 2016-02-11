@@ -766,6 +766,7 @@ float rotate_angle=0,ang=0.0f;;
 glm::vec3 rot;
 bool stop=false,stop1=false;
 bool rotRight=false,rotLeft=false,rotR=false,rotL=false;
+int coinIndex;
 
 /* Render the scene with openGL */
 /* Edit this function according to your assignment */
@@ -958,6 +959,10 @@ void draw ()
         }
         if(i!=heroIndex && i!=leftHandIndex && i!=rightHandIndex)
         {
+            if(i==coinIndex)
+            {
+                rotat[i]+=1;
+            }
             drawobject(objects[i],trans[i],rotat[i],rot);
         }
         else
@@ -1109,9 +1114,10 @@ void initGL (GLFWwindow* window, int width, int height)
     rotat[objcount]=0.0f;
     objcount+=1;
     //Coins
-    objects[objcount]=createPyramid(20,40);
-    trans[objcount]=glm::vec3(0.0f,100.0f,100.0f);
+    objects[objcount]=createPyramid(10,20);
+    trans[objcount]=glm::vec3(-100.0f,-80.0f,140.0f);
     rotat[objcount]=0.0f;
+    coinIndex=objcount;
     objcount+=1;
     // Create and compile our GLSL program from the shaders
     programID = LoadShaders( "Sample_GL.vert", "Sample_GL.frag" );
