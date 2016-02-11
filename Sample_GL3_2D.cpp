@@ -18,8 +18,8 @@ using namespace std;
 #include<bits/stdc++.h>
 #include <ao/ao.h>
 #include <mpg123.h>
+#include<thread>
 
-using namespace std;
 #define ll long long
 #define mp(x,y) make_pair(x,y)
 #define pr pair<int,int>
@@ -366,7 +366,7 @@ void keyboard (GLFWwindow* window, int key, int scancode, int action, int mods)
                 break;
             case GLFW_KEY_SPACE:
                 jumpFlag=true;
-                play_audio("jump_01.mp3");
+                thread(play_audio,"/home/varshit/jump_01.mp3").detach();
                 break;
             default:
                 break;
@@ -880,6 +880,7 @@ void draw ()
       trans[heroIndex][1]-=trans[leftHandIndex][1]+5;
       }
       }*/
+    thread(play_audio,"/home/varshit/jump_01.mp3").detach();
     if(jumpFlag && trans[heroIndex][1]<=-20)
     {
         trans[heroIndex][1]+=0.8;
@@ -1301,7 +1302,8 @@ int main (int argc, char** argv)
     platform[6][8]=2;
     platform[7][8]=2;
     initGL (window, width, height);
-
+    objects[objcount-1]->ColorBuffer=0;
+    cout << "colors " << objects[objcount-1]->ColorBuffer << endl;
     double last_update_time = glfwGetTime(), current_time;
     /* Draw in loop */
     while (!glfwWindowShouldClose(window)) {
