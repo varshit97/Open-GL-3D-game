@@ -212,7 +212,7 @@ bool rectangle_rot_status = true;
 float movePlayerLeft=0.0f,movePlayerRight=0.0f;
 bool leftFlag=false,rightFlag=false;
 bool upFlag=false,downFlag=false,zoomFlag=false;
-bool heroFlag=false,zoom1Flag=false;
+bool heroFlag=false,zoom1Flag=false,jumpFlag=false;
 float camAngle=0;
 bool fall=false,topFlag=false,followFlag=false,headCamFlag=false;
 
@@ -259,6 +259,9 @@ void keyboard (GLFWwindow* window, int key, int scancode, int action, int mods)
             case GLFW_KEY_X:
                 zoom1Flag=false;
                 break;
+            case GLFW_KEY_SPACE:
+                jumpFlag=false;
+                break;
             default:
                 break;
         }
@@ -297,6 +300,9 @@ void keyboard (GLFWwindow* window, int key, int scancode, int action, int mods)
                 break;
             case GLFW_KEY_X:
                 zoom1Flag=true;
+                break;
+            case GLFW_KEY_SPACE:
+                jumpFlag=true;
                 break;
             default:
                 break;
@@ -379,7 +385,7 @@ float D2R(float A)
 glm::vec3 trans[1000];
 float rotat[1000];
 VAO* objects[1000];
-VAO *triangle, *rectangle,*cube;
+VAO *triangle,*rectangle,*cube;
 int platform[10][10];
 
 // Creates the triangle object used in this sample code
@@ -745,6 +751,18 @@ void draw ()
     y=trans[heroIndex][1];
     z=trans[heroIndex][2];
     /* Render your scene */
+    if(jumpFlag && trans[heroIndex][1]<=-25)
+    {
+        trans[heroIndex][1]+=0.8;
+        trans[leftHandIndex][1]+=0.8;
+        trans[rightHandIndex][1]+=0.8;
+    }
+    if(!jumpFlag && trans[heroIndex][1]>-60)
+    {
+        trans[heroIndex][1]-=0.8;
+        trans[leftHandIndex][1]-=0.8;
+        trans[rightHandIndex][1]-=0.8;
+    }
     if(Oiterator==pitCount)
     {
         Oiterator=0;
@@ -1076,15 +1094,13 @@ int main (int argc, char** argv)
         platform[6][2]=0;
         platform[9][2]=0;
    // }
+   // Walls
     platform[1][5]=2;
     platform[2][8]=2;
     platform[3][7]=2;
     platform[6][6]=2;
     initGL (window, width, height);
-    for(int i=0;i<pillCount;i++)
-    {
-        cout << "Pillars " << pillars[i][0] << " " << pillars[i][2] << endl;
-    }
+
     double last_update_time = glfwGetTime(), current_time;
     /* Draw in loop */
     while (!glfwWindowShouldClose(window)) {
