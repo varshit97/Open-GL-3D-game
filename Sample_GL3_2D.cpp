@@ -556,7 +556,7 @@ VAO *createPyramid(float length,float height)
     pyramid = create3DObject(GL_TRIANGLES, 18, vertex_buffer_data, color_buffer_data, GL_FILL);
 }
 
-VAO* createCube(float side)
+VAO* createCube(float side,float colour)
 {
     // GL3 accepts only Triangles. Quads are not supported
     GLfloat vertex_buffer_data [] = {
@@ -634,12 +634,12 @@ VAO* createCube(float side)
         0.302f,  0.455f,  0.848f,
         0.225f,  0.587f,  0.040f,
 
-        0.517f,  0.713f,  0.338f,
-        0.053f,  0.959f,  0.120f,
-        0.393f,  0.621f,  0.362f,
-        0.673f,  0.211f,  0.457f,
-        0.820f,  0.883f,  0.371f,
-        0.982f,  0.099f,  0.879f
+        colour,colour,colour,
+        colour,colour,colour,
+        colour,colour,colour,
+        colour,colour,colour,
+        colour,colour,colour,
+        colour,colour,colour
 
     };
 
@@ -881,6 +881,17 @@ void draw ()
       }
       }*/
     thread(play_audio,"/home/varshit/jump_01.mp3").detach();
+    for(int j=0;j<100;j++)
+    {
+        if(round(trans[heroIndex][0])>trans[j][0]-20 && round(trans[heroIndex][0])<trans[j][0]+20)
+        {
+            objects[j]=createCube(20.0f,0.7f);
+        }
+        else
+        {
+            objects[j]=createCube(20.0f,1.0f);
+        }
+    }
     if(jumpFlag && trans[heroIndex][1]<=-20)
     {
         trans[heroIndex][1]+=0.8;
@@ -1149,7 +1160,7 @@ void initGL (GLFWwindow* window, int width, int height)
                 //floor
                 if(platform[i][j]==1)
                 {
-                    objects[objcount]=createCube(20.0f);
+                    objects[objcount]=createCube(20.0f,1.0f);
                     trans[objcount]=glm::vec3(numX,numY,numZ);
                     rotat[objcount]=0.0f;
                     objcount+=1;
@@ -1160,7 +1171,7 @@ void initGL (GLFWwindow* window, int width, int height)
                     float pillarY=numY+40.0f;
                     for(int l=0;l<pillarHeight;l++)
                     {
-                        objects[objcount]=createCube(20.0f);
+                        objects[objcount]=createCube(20.0f,1.0f);
                         trans[objcount]=glm::vec3(numX,pillarY,numZ);
                         rotat[objcount]=0.0f;
                         objcount+=1;
@@ -1181,7 +1192,7 @@ void initGL (GLFWwindow* window, int width, int height)
         numY+=40.0f;
     }
     //Hero
-    objects[objcount]=createCube(5.0f);
+    objects[objcount]=createCube(5.0f,1.0f);
     trans[objcount]=glm::vec3(-140.0f,-60.0f,140.0f);
     heroIndex=objcount;
     rotat[objcount]=0.0f;
@@ -1303,7 +1314,6 @@ int main (int argc, char** argv)
     platform[7][8]=2;
     initGL (window, width, height);
     objects[objcount-1]->ColorBuffer=0;
-    cout << "colors " << objects[objcount-1]->ColorBuffer << endl;
     double last_update_time = glfwGetTime(), current_time;
     /* Draw in loop */
     while (!glfwWindowShouldClose(window)) {
