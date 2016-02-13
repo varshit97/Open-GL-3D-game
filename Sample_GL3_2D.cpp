@@ -322,7 +322,6 @@ void keyboard (GLFWwindow* window, int key, int scancode, int action, int mods)
                 zoom1Flag=false;
                 break;
             case GLFW_KEY_SPACE:
-                //play_audio("jump_01.mp3");
                 jumpFlag=false;
                 break;
             default:
@@ -366,7 +365,7 @@ void keyboard (GLFWwindow* window, int key, int scancode, int action, int mods)
                 break;
             case GLFW_KEY_SPACE:
                 jumpFlag=true;
-                //thread(play_audio,"/home/varshit/jump_01.mp3").detach();
+                thread(play_audio,"/home/varshit/Downloads/nitro.mp3").detach();
                 break;
             default:
                 break;
@@ -599,47 +598,58 @@ VAO* createCube(float side,float colour)
     };
 
     GLfloat color_buffer_data [] = {
-        0.583f,  0.771f,  0.014f,
-        0.609f,  0.115f,  0.436f,
-        0.327f,  0.483f,  0.844f,
-        0.822f,  0.569f,  0.201f,
-        0.435f,  0.602f,  0.223f,
-        0.310f,  0.747f,  0.185f,
+        //Lite
+        1.0f,102.0/255.0f,0.0f,
+        1.0f,102.0/255.0f,0.0f,
+        1.0f,102.0/255.0f,0.0f,
+        //Back right triangle
+        1.0f,102.0/255.0f,0.0f,
+        1.0f,102.0/255.0f,0.0f,
+        1.0f,102.0/255.0f,0.0f,
+        //Lite
+        1.0f,102.0/255.0f,0.0f,
+        1.0f,102.0/255.0f,0.0f,
+        1.0f,102.0/255.0f,0.0f,
+        //Back left triangle
+        1.0f,102.0/255.0f,0.0f,
+        1.0f,102.0/255.0f,0.0f,
+        1.0f,102.0/255.0f,0.0f,
+        //Left face right triangle
+        1.0f,102.0/255.0f,0.0f,
+        1.0f,102.0/255.0f,0.0f,
+        1.0f,102.0/255.0f,0.0f,
+        //Front face right triangle
+        1.0f,102.0/255.0f,0.0f,
+        1.0f,102.0/255.0f,0.0f,
+        1.0f,102.0/255.0f,0.0f,
+        //Front face left triangle    
+        1.0f,102.0/255.0f,0.0f,
+        1.0f,102.0/255.0f,0.0f,
+        1.0f,102.0/255.0f,0.0f,
+       
+        //Right face left triangle
+        1.0f,102.0/255.0f,0.0f,
+        1.0f,102.0/255.0f,0.0f,
+        1.0f,102.0/255.0f,0.0f,
 
-        0.597f,  0.770f,  0.761f,
-        0.559f,  0.436f,  0.730f,
-        0.359f,  0.583f,  0.152f,
-        0.483f,  0.596f,  0.789f,
-        0.559f,  0.861f,  0.639f,
-        0.195f,  0.548f,  0.859f,
+        //Right face right triangle 
+        1.0f,102.0/255.0f,0.0f,
+        1.0f,102.0/255.0f,0.0f,
+        1.0f,102.0/255.0f,0.0f,
 
-        0.014f,  0.184f,  0.576f,
-        0.771f,  0.328f,  0.970f,
-        0.406f,  0.615f,  0.116f,
-        0.676f,  0.977f,  0.133f,
-        0.971f,  0.572f,  0.833f,
-        0.140f,  0.616f,  0.489f,
-
-        0.997f,  0.513f,  0.064f,
-        0.945f,  0.719f,  0.592f,
-        0.543f,  0.021f,  0.978f,
-        0.279f,  0.317f,  0.505f,
-        0.167f,  0.620f,  0.077f,
-        0.347f,  0.857f,  0.137f,
-
-        0.055f,  0.953f,  0.042f,
-        0.714f,  0.505f,  0.345f,
-        0.783f,  0.290f,  0.734f,
-        0.722f,  0.645f,  0.174f,
-        0.302f,  0.455f,  0.848f,
-        0.225f,  0.587f,  0.040f,
-
-        colour,colour,colour,
-        colour,colour,colour,
-        colour,colour,colour,
-        colour,colour,colour,
-        colour,colour,colour,
-        colour,colour,colour
+        //Top face right triangle
+        1.0f,1.0f,0.0f,
+        1.0f,1.0f,0.0f,
+        1.0f,1.0f,0.0f,
+       
+        //Top face left triangle
+        1.0f,1.0f,0.0f,
+        1.0f,1.0f,0.0f,
+        1.0f,1.0f,0.0f,
+        //Front side right triangle
+        1.0f,102.0/255.0f,0.0f,
+        1.0f,102.0/255.0f,0.0f,
+        1.0f,102.0/255.0f,0.0f,
 
     };
 
@@ -1209,6 +1219,31 @@ void initGL (GLFWwindow* window, int width, int height)
     leftHandIndex=objcount;
     rotat[objcount]=0.0f;
     objcount+=1;
+
+    objects[objcount]=createPyramid(20,40);
+    trans[objcount]=glm::vec3(200.0f,-80.0f,160.0f);
+    rotat[objcount]=0.0f;
+    //coinPos[objcount]=1;
+    objcount+=1;
+
+    objects[objcount]=createPyramid(20,40);
+    trans[objcount]=glm::vec3(200.0f,-80.0f,-200.0f);
+    rotat[objcount]=0.0f;
+    //coinPos[objcount]=1;
+    objcount+=1;
+
+    objects[objcount]=createPyramid(20,40);
+    trans[objcount]=glm::vec3(-200.0f,-80.0f,-200.0f);
+    rotat[objcount]=0.0f;
+    //coinPos[objcount]=1;
+    objcount+=1;
+
+    objects[objcount]=createPyramid(20,40);
+    trans[objcount]=glm::vec3(-200.0f,-80.0f,160.0f);
+    rotat[objcount]=0.0f;
+    //coinPos[objcount]=1;
+    objcount+=1;
+
     //Coins
     objects[objcount]=createPyramid(10,20);
     trans[objcount]=glm::vec3(-100.0f,-80.0f,140.0f);
@@ -1239,12 +1274,6 @@ void initGL (GLFWwindow* window, int width, int height)
     trans[objcount]=glm::vec3(100.0f,-80.0f,140.0f);
     rotat[objcount]=0.0f;
     coinPos[objcount]=1;
-    objcount+=1;
-
-    objects[objcount]=createPyramid(20,40);
-    trans[objcount]=glm::vec3(200.0f,-80.0f,160.0f);
-    rotat[objcount]=0.0f;
-    //coinPos[objcount]=1;
     objcount+=1;
 
     // Create and compile our GLSL program from the shaders
