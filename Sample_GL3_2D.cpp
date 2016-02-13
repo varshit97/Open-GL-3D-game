@@ -1074,7 +1074,7 @@ void draw ()
     for(int j=coinStart;j<objcount;j++)
     {
         rotat[j]+=0.5;
-        if(round(trans[heroIndex][0])==trans[j][0] && round(trans[heroIndex][2]==trans[j][2])
+        if(trans[heroIndex][0]>=trans[j][0] && trans[heroIndex][0]<=trans[j][0]+20 && trans[heroIndex][2]<=trans[j][2]+20 && trans[heroIndex][2]>=trans[j][2]-20)
         {
             coinVanish[j]=true;
         }
