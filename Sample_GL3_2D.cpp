@@ -798,8 +798,8 @@ void drawobject(VAO* obj,glm::vec3 trans,float angle,glm::vec3 rotat)
     }
     if(headCamFlag)
     {
-        float lookX=40*cos(varang*(M_PI/180));
-        float lookY=40*sin(varang*(M_PI/180));
+        float lookX=-40*cos(90-varang*(M_PI/180));
+        float lookY=-40*sin(90-varang*(M_PI/180));
         Matrices.view = glm::lookAt(glm::vec3(x,y+40,z), glm::vec3(x+lookX,y+40,z+lookY), glm::vec3(0,1,0));
     }
     glm::mat4 VP = Matrices.projection * Matrices.view;
@@ -849,7 +849,8 @@ float rotate_angle=0,ang=0.0f;;
 glm::vec3 rot;
 bool stop=false,stop1=false,coinVanish[1000]={false},coinPos[1000];
 bool rotRight=false,rotLeft=false,rotR=false,rotL=false,level=false;
-int coinStart,prevvarang,backgroundTimer=0;
+int coinStart,prevvarang,backgroundTimer=0,presentLevel=1;
+int pillarsLevel[6],prevPillars=0;
 
 /* Render the scene with openGL */
 /* Edit this function according to your assignment */
@@ -891,15 +892,32 @@ void draw ()
     /* Render your scene */
     backgroundTimer+=1;
     //thread(play_audio,"/home/varshit/jump_01.mp3").detach();
-    for(int j=0;j<109;j++)
+    if(presentLevel==1)
     {
-        if(round(trans[heroIndex][0])>trans[j][0]-20 && round(trans[heroIndex][0])<trans[j][0]+20 && round(trans[heroIndex][2])>trans[j][2]-20 && round(trans[heroIndex][2])<trans[j][2]+20)
+        for(int j=0;j<109;j++)
         {
-            objects[j]=createCube(20.0f,51.0f/255.0,133.0f/255.0,1.0f);
+            if(round(trans[heroIndex][0])>trans[j][0]-20 && round(trans[heroIndex][0])<trans[j][0]+20 && round(trans[heroIndex][2])>trans[j][2]-20 && round(trans[heroIndex][2])<trans[j][2]+20)
+            {
+                objects[j]=createCube(20.0f,51.0f/255.0,133.0f/255.0,1.0f);
+            }
+            else
+            {
+                objects[j]=createCube(20.0f,1.0f,1.0f,0.0f);
+            }
         }
-        else
+    }
+    if(presentLevel==2)
+    {
+        for(int j=109;j<219;j++)
         {
-            objects[j]=createCube(20.0f,1.0f,1.0f,0.0f);
+            if(round(trans[heroIndex][0])>trans[j][0]-20 && round(trans[heroIndex][0])<trans[j][0]+20 && round(trans[heroIndex][2])>trans[j][2]-20 && round(trans[heroIndex][2])<trans[j][2]+20)
+            {
+                objects[j]=createCube(20.0f,51.0f/255.0,133.0f/255.0,1.0f);
+            }
+            else
+            {
+                objects[j]=createCube(20.0f,1.0f,1.0f,0.0f);
+            }
         }
     }
     if(jumpFlag)
@@ -934,14 +952,17 @@ void draw ()
     {
         Oiterator=0;
     }
-    if(PillIterator==pillCount)
+    if(PillIterator==pillarsLevel[presentLevel])
     {
-        PillIterator=0;
+        PillIterator=prevPillars;
     }
     if(trans[heroIndex][0]<=pits[Oiterator][0]+20 && trans[heroIndex][0]>=pits[Oiterator][0]-20 && trans[heroIndex][2]<=pits[Oiterator][2]+20 && trans[heroIndex][2]>=pits[Oiterator][2]-20 && !fall)
     {
         fall=true;
         level=true;
+        prevPillars=pillarsLevel[presentLevel];
+        presentLevel+=1;
+        PillIterator=prevPillars;
     }
     if(fall)
     {
@@ -951,7 +972,7 @@ void draw ()
             {
                 trans[i][1]+=1;
             }
-            for(int j=109;j<219;j++)
+            for(int j=109;j<226;j++)
             {
                 if(trans[110][1]==-100)
                 {
@@ -1136,8 +1157,9 @@ void draw ()
     prevvarang=varang;
 }
 
-void createMap(int platform[][12],float yPos)
+void createMap(int platform[][12],float yPos,int yourLevel)
 {
+    int presentPillars=0;
     float numY=yPos;
     for(int k=0;k<1;k++)
     {
@@ -1169,6 +1191,7 @@ void createMap(int platform[][12],float yPos)
                     }
                     pillars[pillCount]=glm::vec3(numX,pillarY,numZ);
                     pillCount+=1;
+                    presentPillars+=1;
                 }
                 else if(platform[i][j]==0)
                 {
@@ -1181,6 +1204,7 @@ void createMap(int platform[][12],float yPos)
         }
         numY+=40.0f;
     }
+    pillarsLevel[yourLevel]=presentPillars;
 }
 
 /* Initialise glfw window, I/O callbacks and the renderer to use */
@@ -1241,8 +1265,9 @@ void initGL (GLFWwindow* window, int width, int height)
     // Create the models
     //createTriangle (); // Generate the VAO, VBOs, vertices data & copy into the array buffer
     //send half length of side
-    createMap(platform1,-100);
-    createMap(platform2,-400);
+    createMap(platform1,-100,1);
+    createMap(platform2,-400,2);
+
     //Hero
     objects[objcount]=createCube(5.0f,1.0f,1.0f,0.0f);
     trans[objcount]=glm::vec3(-140.0f,-60.0f,140.0f);
