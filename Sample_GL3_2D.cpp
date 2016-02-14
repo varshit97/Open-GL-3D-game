@@ -840,7 +840,7 @@ float rotate_angle=0,ang=0.0f;;
 glm::vec3 rot;
 bool stop=false,stop1=false,coinVanish[1000]={false},coinPos[1000];
 bool rotRight=false,rotLeft=false,rotR=false,rotL=false;
-int coinStart;
+int coinStart,prevvarang;
 
 /* Render the scene with openGL */
 /* Edit this function according to your assignment */
@@ -942,26 +942,18 @@ void draw ()
     float pillY=trans[heroIndex][1]-pillars[PillIterator][1];
     float pillZ=trans[heroIndex][2]-pillars[PillIterator][2];
     float distance=sqrt((pillX*pillX)+(pillY*pillY)+(pillZ*pillZ));
-    if(distance<=52)
+    if(upFlag)
     {
-        upFlag=false;
-        leftFlag=false;
-        rightFlag=false;
-        stop=true;
-    }
-    if(upFlag && !stop)
-    {
-        if(stop1)
+        if(!stop)
         {
-            stop1=false;
-        }
         trans[heroIndex][2]-=0.3*cos(varang*(M_PI/180));
         trans[heroIndex][0]-=0.3*sin(varang*(M_PI/180));
         trans[rightHandIndex][0]-=0.3*sin(varang*(M_PI/180));
         trans[rightHandIndex][2]-=0.3*cos(varang*(M_PI/180));
         trans[leftHandIndex][0]-=0.3*sin(varang*(M_PI/180));
         trans[leftHandIndex][2]-=0.3*cos(varang*(M_PI/180));
-        if(!jumpFlag)
+        }
+        if(!jumpFlag && !stop)
         {
             if(rotat[rightHandIndex]<30 && !rotRight)
             {
@@ -999,17 +991,16 @@ void draw ()
     }
     if(downFlag && !stop1 && !jumpFlag)
     {
-        if(stop)
+        if(!stop)
         {
-            stop=false;
-        }
         trans[heroIndex][2]+=0.3*cos(varang*(M_PI/180));
         trans[heroIndex][0]+=0.3*sin(varang*(M_PI/180));
         trans[rightHandIndex][0]+=0.3*sin(varang*(M_PI/180));
         trans[rightHandIndex][2]+=0.3*cos(varang*(M_PI/180));
         trans[leftHandIndex][0]+=0.3*sin(varang*(M_PI/180));
         trans[leftHandIndex][2]+=0.3*cos(varang*(M_PI/180));
-        if(!jumpFlag)
+        }
+        if(!jumpFlag && !stop)
         {
             if(rotat[rightHandIndex]>=-30 && !rotR)
             {
@@ -1081,6 +1072,15 @@ void draw ()
             }
         }  
     }
+    if(distance<=52)
+    {
+        prevvarang=0;
+        stop=true;
+    }
+    if(varang>prevvarang)
+    {
+        stop=false;
+    }
     for(int j=coinStart;j<objcount;j++)
     {
         rotat[j]+=0.5;
@@ -1100,6 +1100,7 @@ void draw ()
     triangle_rotation = triangle_rotation + increments*triangle_rot_dir*triangle_rot_status;
     rectangle_rotation = rectangle_rotation + increments*rectangle_rot_dir*rectangle_rot_status;
     countobj+=1;
+    prevvarang=varang;
 }
 
 /* Initialise glfw window, I/O callbacks and the renderer to use */
@@ -1320,7 +1321,7 @@ int main (int argc, char** argv)
     //     int fall1=rand()%10;
     //     int fall2=rand()%10;
     //platform[8][2]=0;
-    platform[1][1]=0;
+    platform[6][1]=0;
     //    platform[2][3]=0;
     //    platform[3][4]=0;
     //    platform[6][2]=0;
