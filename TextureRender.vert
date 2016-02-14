@@ -30,5 +30,5 @@ void main ()
     objectPositionout = objectPosition + vertexPosition;
     playerPositionout = playerPosition;
     playerAngleout = playerAngle;
-    levelout = level;
+    levelout = 1;
 }

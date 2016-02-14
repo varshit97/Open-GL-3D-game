@@ -777,7 +777,7 @@ float y=trans[heroIndex][1];
 float z=trans[heroIndex][2];
 float varang=0;
 
-void drawobject(VAO* obj,glm::vec3 trans,float angle,glm::vec3 rotat)
+void drawobject(VAO* obj,glm::vec3 transi,float angle,glm::vec3 rotat,int i)
 {
     if(zoomFlag)
     {
@@ -818,11 +818,17 @@ void drawobject(VAO* obj,glm::vec3 trans,float angle,glm::vec3 rotat)
     glm::mat4 VP = Matrices.projection * Matrices.view;
     glm::mat4 MVP;
     Matrices.model = glm::mat4(1.0f);
-    glm::mat4 translatemat = glm::translate(trans);
+    glm::mat4 translatemat = glm::translate(transi);
     glm::mat4 rotatemat = glm::rotate(D2R(formatAngle(angle)), rotat);
     Matrices.model *= (translatemat * rotatemat);
     MVP = VP * Matrices.model;
     glUniformMatrix4fv(Matrices.MatrixID, 1, GL_FALSE, &MVP[0][0]);
+    GLint myUniformLocation = glGetUniformLocation(programID, "playerPosition");            
+    glUniform3f(myUniformLocation, 1.0, 2.0, 3.0);
+    myUniformLocation = glGetUniformLocation(programID, "objectPosition");            
+    glUniform3f(myUniformLocation,trans[i][0],trans[i][1],trans[i][2]);
+    myUniformLocation = glGetUniformLocation(programID, "playerAngle");            
+    glUniform1f(myUniformLocation,varang);
     draw3DObject(obj);
 }
 
@@ -838,6 +844,12 @@ void drawHero(VAO* obj,glm::vec3 trans,float angle,glm::vec3 rotat,glm::vec3 her
     Matrices.model *= (translatemat*rotateatorg *toorigin* rotatemat);
     MVP = VP * Matrices.model;
     glUniformMatrix4fv(Matrices.MatrixID, 1, GL_FALSE, &MVP[0][0]);
+    GLint myUniformLocation = glGetUniformLocation(programID, "playerPosition");            
+    glUniform3f(myUniformLocation,trans[heroIndex][0],trans[heroIndex][1],trans[heroIndex][2]);
+    myUniformLocation = glGetUniformLocation(programID, "objectPosition");            
+    glUniform3f(myUniformLocation,(float)(trans[i][0]),(float)(trans[i][1]),(float)(trans[i][2]));
+    myUniformLocation = glGetUniformLocation(programID, "playerAngle");            
+    glUniform1f(myUniformLocation,varang);
     draw3DObject(obj);
 }
 
@@ -1118,7 +1130,7 @@ void draw ()
             {
                 continue;
             }
-            drawobject(objects[i],trans[i],rotat[i],rot);
+            drawobject(objects[i],trans[i],rotat[i],rot,i);
         }
         else
         {
@@ -1361,7 +1373,7 @@ void initGL (GLFWwindow* window, int width, int height)
     // Create and compile our GLSL program from the shaders
 
     // Create and compile our GLSL program from the shaders
-    programID = LoadShaders( "Sample_GL.vert", "Sample_GL.frag" );
+    programID = LoadShaders( "TextureRender.vert","TextureRender.frag" );
     // Get a handle for our "MVP" uniform
     Matrices.MatrixID = glGetUniformLocation(programID, "MVP");
 
