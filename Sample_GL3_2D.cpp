@@ -405,6 +405,19 @@ void mouseButton (GLFWwindow* window, int button, int action, int mods)
     }
 }
 
+float scrollLen=0;
+
+void cbfun (GLFWwindow* window, double x,double y)
+{
+    if(y==-1)
+    {
+        scrollLen+=5;
+    }
+    if(y==1)
+    {
+        scrollLen-=5;
+    }
+}
 
 /* Executed when window is resized to 'width' and 'height' */
 /* Modify the bounds of the screen here in glm::ortho or Field of View in glm::Perspective */
@@ -786,7 +799,7 @@ void drawobject(VAO* obj,glm::vec3 trans,float angle,glm::vec3 rotat)
     }
     else
     {
-        Matrices.view = glm::lookAt(glm::vec3(700*cos(camAngle*(M_PI/180)),300,700*sin(camAngle*(M_PI/180))), glm::vec3(0,0,0), glm::vec3(0,1,0));
+        Matrices.view = glm::lookAt(glm::vec3(700*cos(camAngle*(M_PI/180)),300,scrollLen+700*sin(camAngle*(M_PI/180))), glm::vec3(0,0,0), glm::vec3(0,1,0));
     }
     if(topFlag)
     { 
@@ -930,11 +943,11 @@ void draw ()
     }
     if(timer%60==1)
     {
-        thread(play_audio,"/home/varshit/Downloads/nitro.mp3").detach();
+        thread(play_audio,"nitro.mp3").detach();
     }
     if(backgroundTimer%(142*60)==1)
     {
-        thread(play_audio,"/home/varshit/Downloads/background.mp3").detach();
+        thread(play_audio,"background.mp3").detach();
     }
     if(jumpFlag && trans[heroIndex][1]<=-20)
     {
@@ -1248,7 +1261,8 @@ GLFWwindow* initGLFW (int width, int height)
     /* Register function to handle keyboard input */
     glfwSetKeyCallback(window, keyboard);      // general keyboard input
     glfwSetCharCallback(window, keyboardChar);  // simpler specific character handling
-
+        
+    glfwSetScrollCallback(window,cbfun);
     /* Register function to handle mouse click */
     glfwSetMouseButtonCallback(window, mouseButton);  // mouse button clicks
 
@@ -1434,7 +1448,6 @@ int main (int argc, char** argv)
     platform2[7][8]=2;
     //Walls
     initGL (window, width, height);
-    cout << "total objs " << cnt << endl;
     objects[objcount-1]->ColorBuffer=0;
     double last_update_time = glfwGetTime(), current_time;
     /* Draw in loop */
@@ -1448,7 +1461,6 @@ int main (int argc, char** argv)
 
         // Poll for Keyboard and mouse events
         glfwPollEvents();
-
         // Control based on time (Time based transformation like 5 degrees rotation every 0.5s)
         current_time = glfwGetTime(); // Time in seconds
         if ((current_time - last_update_time) >= 0.5) { // atleast 0.5s elapsed since last frame
