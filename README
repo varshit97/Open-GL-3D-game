@@ -1,3 +1,22 @@
-The character is inspired by TARS
+The hero character is inspired by TARS
 It can be cotrolled by using the arrow keys
 Its legs move forward and backward
+
+All camera effects are added
+Z for helicopter cam
+F for follow cam
+H for head cam
+T for tower cam
+Mouse scroll in for zoom in
+Mouse scroll out for zoom out
+
+Collision with walls are checked.
+
+The robot rotates about Y-axis for taking turnings.
+
+The maps can be created and inserted then and there.
+
+The robot falls off from the edges and falls into pits which takes it to the next level.
+
+As of now only 2 levels are present.
+We can add any number of levels we want.
