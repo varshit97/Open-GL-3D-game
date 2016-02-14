@@ -848,7 +848,7 @@ float triangle_rotation = 0;
 float rotate_angle=0,ang=0.0f;;
 glm::vec3 rot;
 bool stop=false,stop1=false,coinVanish[1000]={false},coinPos[1000];
-bool rotRight=false,rotLeft=false,rotR=false,rotL=false,level=true;
+bool rotRight=false,rotLeft=false,rotR=false,rotL=false,level=false;
 int coinStart,prevvarang,backgroundTimer=0;
 
 /* Render the scene with openGL */
@@ -917,7 +917,6 @@ void draw ()
     if(backgroundTimer%(142*60)==1)
     {
         thread(play_audio,"/home/varshit/Downloads/background.mp3").detach();
-        //backgroundTimer=0;
     }
     if(jumpFlag && trans[heroIndex][1]<=-20)
     {
@@ -950,23 +949,20 @@ void draw ()
         {
             for(int i=0;i<109;i++)
             {
-                if(i!=heroIndex && i!=leftHandIndex && i!=rightHandIndex)
-                {
-                    trans[i][2]+=0.1;
-                }
+                trans[i][1]+=1;
             }
             for(int j=109;j<219;j++)
             {
-                if(j!=heroIndex && j!=leftHandIndex && j!=rightHandIndex)
+                if(trans[110][1]==-100)
                 {
-                    trans[j][2]+=0.1;
+                    level=false;
                 }
+                trans[j][1]+=1;
             }
-            level=false;
         }
-        trans[heroIndex][1]-=0.3;
-        trans[leftHandIndex][1]-=0.3;
-        trans[rightHandIndex][1]-=0.3;
+        //trans[heroIndex][1]-=1;
+        //trans[leftHandIndex][1]-=1;
+        //trans[rightHandIndex][1]-=1;
     }
     if(trans[heroIndex][0]<=-200 || trans[heroIndex][0]>=200 || trans[heroIndex][2]<=-200 || trans[heroIndex][2]>=200)
     {
@@ -1122,10 +1118,7 @@ void draw ()
         rotat[j]+=0.5;
         if(trans[heroIndex][0]>=trans[j][0] && trans[heroIndex][0]<=trans[j][0]+20 && trans[heroIndex][2]<=trans[j][2]+20 && trans[heroIndex][2]>=trans[j][2]-20)
         {
-            if(coinTimer%180==1)
-            {
-                thread(play_audio,"/home/varshit/Downloads/coin.mp3").detach();
-            }
+            //thread(play_audio,"/home/varshit/Downloads/coin.mp3").detach();
             coinVanish[j]=true;
         }
     }
@@ -1249,7 +1242,7 @@ void initGL (GLFWwindow* window, int width, int height)
     //createTriangle (); // Generate the VAO, VBOs, vertices data & copy into the array buffer
     //send half length of side
     createMap(platform1,-100);
-    createMap(platform2,-300);
+    createMap(platform2,-400);
     //Hero
     objects[objcount]=createCube(5.0f,1.0f,1.0f,0.0f);
     trans[objcount]=glm::vec3(-140.0f,-60.0f,140.0f);
