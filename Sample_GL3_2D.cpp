@@ -278,6 +278,7 @@ void *play_audio(string audioFile)
     mpg123_delete(mh);
 }
 
+int timer=0;
 /* Executed when a regular key is pressed/released/held-down */
 /* Prefered for Keyboard events */
 void keyboard (GLFWwindow* window, int key, int scancode, int action, int mods)
@@ -365,7 +366,7 @@ void keyboard (GLFWwindow* window, int key, int scancode, int action, int mods)
                 break;
             case GLFW_KEY_SPACE:
                 jumpFlag=true;
-                thread(play_audio,"/home/varshit/Downloads/nitro.mp3").detach();
+                timer=0;
                 break;
             default:
                 break;
@@ -449,7 +450,14 @@ glm::vec3 trans[1000];
 float rotat[1000];
 VAO* objects[1000];
 VAO *triangle,*rectangle,*cube,*pyramid;
-int platform[11][12];
+int platform1[11][12];
+int platform2[11][12];
+int platform3[11][12];
+int platform4[11][12];
+int platform5[11][12];
+int platform6[11][12];
+int platform7[11][12];
+int platform8[11][12];
 
 // Creates the triangle object used in this sample code
 void createTriangle ()
@@ -555,7 +563,7 @@ VAO *createPyramid(float length,float height)
     pyramid = create3DObject(GL_TRIANGLES, 18, vertex_buffer_data, color_buffer_data, GL_FILL);
 }
 
-VAO* createCube(float side,float colour)
+VAO* createCube(float side,float colour1,float colour2,float colour3)
 {
     // GL3 accepts only Triangles. Quads are not supported
     GLfloat vertex_buffer_data [] = {
@@ -626,7 +634,7 @@ VAO* createCube(float side,float colour)
         1.0f,102.0/255.0f,0.0f,
         1.0f,102.0/255.0f,0.0f,
         1.0f,102.0/255.0f,0.0f,
-       
+
         //Right face left triangle
         1.0f,102.0/255.0f,0.0f,
         1.0f,102.0/255.0f,0.0f,
@@ -638,14 +646,15 @@ VAO* createCube(float side,float colour)
         1.0f,102.0/255.0f,0.0f,
 
         //Top face right triangle
-        1.0f,1.0f,0.0f,
-        1.0f,1.0f,0.0f,
-        1.0f,1.0f,0.0f,
-       
+        colour1,colour2,colour3,
+        colour1,colour2,colour3,
+        colour1,colour2,colour3,
+
         //Top face left triangle
-        1.0f,1.0f,0.0f,
-        1.0f,1.0f,0.0f,
-        1.0f,1.0f,0.0f,
+        colour1,colour2,colour3,
+        colour1,colour2,colour3,
+        colour1,colour2,colour3,
+
         //Front side right triangle
         1.0f,102.0/255.0f,0.0f,
         1.0f,102.0/255.0f,0.0f,
@@ -839,8 +848,8 @@ float triangle_rotation = 0;
 float rotate_angle=0,ang=0.0f;;
 glm::vec3 rot;
 bool stop=false,stop1=false,coinVanish[1000]={false},coinPos[1000];
-bool rotRight=false,rotLeft=false,rotR=false,rotL=false;
-int coinStart,prevvarang;
+bool rotRight=false,rotLeft=false,rotR=false,rotL=false,level=true;
+int coinStart,prevvarang,backgroundTimer=0;
 
 /* Render the scene with openGL */
 /* Edit this function according to your assignment */
@@ -880,27 +889,35 @@ void draw ()
     y=trans[heroIndex][1];
     z=trans[heroIndex][2];
     /* Render your scene */
-    /*for(int i=0;i<objcount;i++)
-      {
-      if(trans[rightHandIndex][1]+35>=trans[i][1] && i!=heroIndex && i!=leftHandIndex && i!=rightHandIndex)
-      {
-      cout << "hello " << trans[rightHandIndex][1] << " " << trans[i][1] << endl;
-      trans[rightHandIndex][1]-=trans[rightHandIndex][1]-trans[i][1];
-      trans[leftHandIndex][1]-=trans[rightHandIndex][1]-trans[i][1];
-      trans[heroIndex][1]-=trans[leftHandIndex][1]+5;
-      }
-      }*/
+    backgroundTimer+=1;
     //thread(play_audio,"/home/varshit/jump_01.mp3").detach();
-    for(int j=0;j<100;j++)
+    for(int j=0;j<109;j++)
     {
         if(round(trans[heroIndex][0])>trans[j][0]-20 && round(trans[heroIndex][0])<trans[j][0]+20 && round(trans[heroIndex][2])>trans[j][2]-20 && round(trans[heroIndex][2])<trans[j][2]+20)
         {
-            objects[j]=createCube(20.0f,0.7f);
+            objects[j]=createCube(20.0f,51.0f/255.0,133.0f/255.0,1.0f);
         }
         else
         {
-            objects[j]=createCube(20.0f,1.0f);
+            objects[j]=createCube(20.0f,1.0f,1.0f,0.0f);
         }
+    }
+    if(jumpFlag)
+    {
+        timer+=1;
+    }
+    else
+    {
+        timer=0;
+    }
+    if(timer%60==1)
+    {
+        thread(play_audio,"/home/varshit/Downloads/nitro.mp3").detach();
+    }
+    if(backgroundTimer%(142*60)==1)
+    {
+        thread(play_audio,"/home/varshit/Downloads/background.mp3").detach();
+        //backgroundTimer=0;
     }
     if(jumpFlag && trans[heroIndex][1]<=-20)
     {
@@ -925,9 +942,28 @@ void draw ()
     if(trans[heroIndex][0]<=pits[Oiterator][0]+20 && trans[heroIndex][0]>=pits[Oiterator][0]-20 && trans[heroIndex][2]<=pits[Oiterator][2]+20 && trans[heroIndex][2]>=pits[Oiterator][2]-20 && !fall)
     {
         fall=true;
+        level=true;
     }
     if(fall)
     {
+        if(level)
+        {
+            for(int i=0;i<109;i++)
+            {
+                if(i!=heroIndex && i!=leftHandIndex && i!=rightHandIndex)
+                {
+                    trans[i][2]+=0.1;
+                }
+            }
+            for(int j=109;j<219;j++)
+            {
+                if(j!=heroIndex && j!=leftHandIndex && j!=rightHandIndex)
+                {
+                    trans[j][2]+=0.1;
+                }
+            }
+            level=false;
+        }
         trans[heroIndex][1]-=0.3;
         trans[leftHandIndex][1]-=0.3;
         trans[rightHandIndex][1]-=0.3;
@@ -946,12 +982,12 @@ void draw ()
     {
         if(!stop)
         {
-        trans[heroIndex][2]-=0.3*cos(varang*(M_PI/180));
-        trans[heroIndex][0]-=0.3*sin(varang*(M_PI/180));
-        trans[rightHandIndex][0]-=0.3*sin(varang*(M_PI/180));
-        trans[rightHandIndex][2]-=0.3*cos(varang*(M_PI/180));
-        trans[leftHandIndex][0]-=0.3*sin(varang*(M_PI/180));
-        trans[leftHandIndex][2]-=0.3*cos(varang*(M_PI/180));
+            trans[heroIndex][2]-=0.3*cos(varang*(M_PI/180));
+            trans[heroIndex][0]-=0.3*sin(varang*(M_PI/180));
+            trans[rightHandIndex][0]-=0.3*sin(varang*(M_PI/180));
+            trans[rightHandIndex][2]-=0.3*cos(varang*(M_PI/180));
+            trans[leftHandIndex][0]-=0.3*sin(varang*(M_PI/180));
+            trans[leftHandIndex][2]-=0.3*cos(varang*(M_PI/180));
         }
         if(!jumpFlag && !stop)
         {
@@ -993,12 +1029,12 @@ void draw ()
     {
         if(!stop)
         {
-        trans[heroIndex][2]+=0.3*cos(varang*(M_PI/180));
-        trans[heroIndex][0]+=0.3*sin(varang*(M_PI/180));
-        trans[rightHandIndex][0]+=0.3*sin(varang*(M_PI/180));
-        trans[rightHandIndex][2]+=0.3*cos(varang*(M_PI/180));
-        trans[leftHandIndex][0]+=0.3*sin(varang*(M_PI/180));
-        trans[leftHandIndex][2]+=0.3*cos(varang*(M_PI/180));
+            trans[heroIndex][2]+=0.3*cos(varang*(M_PI/180));
+            trans[heroIndex][0]+=0.3*sin(varang*(M_PI/180));
+            trans[rightHandIndex][0]+=0.3*sin(varang*(M_PI/180));
+            trans[rightHandIndex][2]+=0.3*cos(varang*(M_PI/180));
+            trans[leftHandIndex][0]+=0.3*sin(varang*(M_PI/180));
+            trans[leftHandIndex][2]+=0.3*cos(varang*(M_PI/180));
         }
         if(!jumpFlag && !stop)
         {
@@ -1086,6 +1122,10 @@ void draw ()
         rotat[j]+=0.5;
         if(trans[heroIndex][0]>=trans[j][0] && trans[heroIndex][0]<=trans[j][0]+20 && trans[heroIndex][2]<=trans[j][2]+20 && trans[heroIndex][2]>=trans[j][2]-20)
         {
+            if(coinTimer%180==1)
+            {
+                thread(play_audio,"/home/varshit/Downloads/coin.mp3").detach();
+            }
             coinVanish[j]=true;
         }
     }
@@ -1101,6 +1141,53 @@ void draw ()
     rectangle_rotation = rectangle_rotation + increments*rectangle_rot_dir*rectangle_rot_status;
     countobj+=1;
     prevvarang=varang;
+}
+
+void createMap(int platform[][12],float yPos)
+{
+    float numY=yPos;
+    for(int k=0;k<1;k++)
+    {
+        float numZ=-200.0f;
+        for(int i=0;i<blocks;i++)
+        {
+            float numX=-200.0f;
+            for(int j=0;j<11;j++)
+            {
+                //floor
+                if(platform[i][j]==1)
+                {
+                    objects[objcount]=createCube(20.0f,1.0f,1.0f,0.0f);
+                    trans[objcount]=glm::vec3(numX,numY,numZ);
+                    rotat[objcount]=0.0f;
+                    objcount+=1;
+                }
+                //pillars
+                if(platform[i][j]==2)
+                {
+                    float pillarY=numY+40.0f;
+                    for(int l=0;l<pillarHeight;l++)
+                    {
+                        objects[objcount]=createCube(20.0f,1.0f,1.0f,0.0f);
+                        trans[objcount]=glm::vec3(numX,pillarY,numZ);
+                        rotat[objcount]=0.0f;
+                        objcount+=1;
+                        pillarY+=40.0f;
+                    }
+                    pillars[pillCount]=glm::vec3(numX,pillarY,numZ);
+                    pillCount+=1;
+                }
+                else if(platform[i][j]==0)
+                {
+                    pits[pitCount]=glm::vec3(numX,numY,numZ);
+                    pitCount+=1;
+                }
+                numX+=40.0f;
+            }
+            numZ+=40.0f;
+        }
+        numY+=40.0f;
+    }
 }
 
 /* Initialise glfw window, I/O callbacks and the renderer to use */
@@ -1151,6 +1238,8 @@ GLFWwindow* initGLFW (int width, int height)
     return window;
 }
 
+int cnt;
+
 /* Initialize the OpenGL rendering properties */
 /* Add all the models to be created here */
 void initGL (GLFWwindow* window, int width, int height)
@@ -1159,51 +1248,10 @@ void initGL (GLFWwindow* window, int width, int height)
     // Create the models
     //createTriangle (); // Generate the VAO, VBOs, vertices data & copy into the array buffer
     //send half length of side
-    float numY=-100.0f;
-    for(int k=0;k<1;k++)
-    {
-        float numZ=-200.0f;
-        for(int i=0;i<blocks;i++)
-        {
-            float numX=-200.0f;
-            for(int j=0;j<11;j++)
-            {
-                //floor
-                if(platform[i][j]==1)
-                {
-                    objects[objcount]=createCube(20.0f,1.0f);
-                    trans[objcount]=glm::vec3(numX,numY,numZ);
-                    rotat[objcount]=0.0f;
-                    objcount+=1;
-                }
-                //pillars
-                if(platform[i][j]==2)
-                {
-                    float pillarY=numY+40.0f;
-                    for(int l=0;l<pillarHeight;l++)
-                    {
-                        objects[objcount]=createCube(20.0f,1.0f);
-                        trans[objcount]=glm::vec3(numX,pillarY,numZ);
-                        rotat[objcount]=0.0f;
-                        objcount+=1;
-                        pillarY+=40.0f;
-                    }
-                    pillars[pillCount]=glm::vec3(numX,pillarY,numZ);
-                    pillCount+=1;
-                }
-                else if(platform[i][j]==0)
-                {
-                    pits[pitCount]=glm::vec3(numX,numY,numZ);
-                    pitCount+=1;
-                }
-                numX+=40.0f;
-            }
-            numZ+=40.0f;
-        }
-        numY+=40.0f;
-    }
+    createMap(platform1,-100);
+    createMap(platform2,-300);
     //Hero
-    objects[objcount]=createCube(5.0f,1.0f);
+    objects[objcount]=createCube(5.0f,1.0f,1.0f,0.0f);
     trans[objcount]=glm::vec3(-140.0f,-60.0f,140.0f);
     heroIndex=objcount;
     rotat[objcount]=0.0f;
@@ -1312,43 +1360,63 @@ int main (int argc, char** argv)
     {
         for(int j=0;j<12;j++)
         {
-            platform[i][j]=1;
+            platform1[i][j]=1;
+        }
+    }
+    for(int i=0;i<11;i++)
+    {
+        for(int j=0;j<12;j++)
+        {
+            platform2[i][j]=1;
         }
     }
     //Pits
-    //for(int i=0;i<holes;i++)
-    // {
-    //     int fall1=rand()%10;
-    //     int fall2=rand()%10;
-    //platform[8][2]=0;
-    platform[6][1]=0;
-    //    platform[2][3]=0;
-    //    platform[3][4]=0;
-    //    platform[6][2]=0;
-    //    platform[9][2]=0;
-    // }
+    platform1[6][1]=0;
     // Walls
-    platform[2][3]=2;
-    platform[2][4]=2;
-    platform[2][5]=2;
-    platform[2][6]=2;
-    platform[2][7]=2;
-    platform[2][8]=2;
-    platform[3][5]=2;
-    platform[4][5]=2;
-    platform[5][5]=2;
-    platform[7][2]=1;
-    platform[6][2]=1;
-    platform[5][2]=1;
-    platform[4][2]=1;
-    platform[3][2]=1;
-    platform[2][2]=2;
-    platform[3][8]=2;
-    platform[4][8]=2;
-    platform[5][8]=2;
-    platform[6][8]=2;
-    platform[7][8]=2;
+    platform1[2][3]=2;
+    platform1[2][4]=2;
+    platform1[2][5]=2;
+    platform1[2][6]=2;
+    platform1[2][7]=2;
+    platform1[2][8]=2;
+    platform1[3][5]=2;
+    platform1[4][5]=2;
+    platform1[5][5]=2;
+    platform1[7][2]=1;
+    platform1[6][2]=1;
+    platform1[5][2]=1;
+    platform1[4][2]=1;
+    platform1[3][2]=1;
+    platform1[2][2]=2;
+    platform1[3][8]=2;
+    platform1[4][8]=2;
+    platform1[5][8]=2;
+    platform1[6][8]=2;
+    platform1[7][8]=2;
+    //Level 2
+    platform2[2][3]=2;
+    platform2[2][4]=2;
+    platform2[2][5]=2;
+    platform2[2][6]=2;
+    platform2[2][7]=2;
+    platform2[2][8]=2;
+    platform2[3][5]=2;
+    platform2[4][5]=2;
+    platform2[5][5]=2;
+    platform2[7][2]=2;
+    platform2[6][2]=2;
+    platform2[5][2]=2;
+    platform2[4][2]=2;
+    platform2[3][2]=2;
+    platform2[2][2]=2;
+    platform2[3][8]=2;
+    platform2[4][8]=2;
+    platform2[5][8]=2;
+    platform2[6][8]=2;
+    platform2[7][8]=2;
+    //Walls
     initGL (window, width, height);
+    cout << "total objs " << cnt << endl;
     objects[objcount-1]->ColorBuffer=0;
     double last_update_time = glfwGetTime(), current_time;
     /* Draw in loop */
